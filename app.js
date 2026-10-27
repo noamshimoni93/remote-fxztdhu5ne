@@ -533,6 +533,10 @@
   document.querySelectorAll('[data-key]').forEach(function (b) {
     b.addEventListener('click', function () { padPress(b.getAttribute('data-key')); });
   });
+  document.getElementById('pad-home').addEventListener('click', function () {
+    if (navigator.vibrate) navigator.vibrate(10);
+    send({ cmd: 'home' }).catch(function () {});
+  });
   document.getElementById('power').addEventListener('click', function () {
     var on = !tvIsOn();
     send({ cmd: 'power', on: on }).then(function () {
