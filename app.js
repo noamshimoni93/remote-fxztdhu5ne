@@ -22,6 +22,11 @@
       save: 'Save to the TV', wallpaper: 'Wallpaper', upload: 'Use one of my photos',
       uploadHint: 'Cropped to the TV’s shape and sent through the relay.', uploading: 'Sending the photo…',
       tooBig: 'That photo is too big to send', whoTitle: 'Who’s using this phone?',
+      volMac: 'Uses the TV’s own volume, through the Mac.',
+      padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', samsungHome: 'Home', tabPad: 'Pad',
+      padHint: 'Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.',
+      padNoMac: 'The keys are pressed by the Mac. It’s asleep or off right now, so they won’t reach the TV.',
+      volNoMac: 'The Mac is asleep or off, so the volume only changes on the TV Home screen.',
       whoHint: 'Your name goes with your messages. You can change it on the Message tab.', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
       tabWall: 'Wallpaper', sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay',
       saved: 'Saved', wallSet: 'Wallpaper changed', noKey: 'Open this page from your personal link to connect to the TV.',
@@ -41,6 +46,11 @@
       save: 'שמירה בטלוויזיה', wallpaper: 'רקע', upload: 'שימוש בתמונה שלי',
       uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'שולח את התמונה…',
       tooBig: 'התמונה גדולה מדי לשליחה', whoTitle: 'מי משתמש בטלפון הזה?',
+      volMac: 'משתמש בעוצמת הקול של הטלוויזיה עצמה, דרך המק.',
+      padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', samsungHome: 'בית', tabPad: 'שלט',
+      padHint: 'עובד בתוך נטפליקס, Apple TV ושאר האפליקציות, כמו השלט של הטלוויזיה. לחיצות מהירות נשלחות יחד, כך שלחיצה יכולה להתעכב רגע.',
+      padNoMac: 'את המקשים לוחץ המק. כרגע הוא כבוי או במצב שינה, ולכן הם לא יגיעו לטלוויזיה.',
+      volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול משתנה רק במסך הבית.',
       whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
       tabWall: 'רקע', sent: 'נשלח', opening: 'פותח את {app}', failed: 'אין חיבור לממסר',
       saved: 'נשמר', wallSet: 'הרקע הוחלף', noKey: 'יש לפתוח את הדף מהקישור האישי כדי להתחבר לטלוויזיה.',
@@ -117,6 +127,22 @@
     setStatus('on');
   }
 
+  // A live relay subscription that backs off when refused: the browser's own retry every few seconds
+  // keeps a whole home over ntfy.sh's limit (about one request every 5 s).
+  function subscribe(url, onMessage) {
+    var wait = 5000;
+    (function open() {
+      var source = new EventSource(url);
+      source.onopen = function () { wait = 5000; };
+      source.onmessage = function (m) { wait = 5000; onMessage(m); };
+      source.onerror = function () {
+        source.close();
+        setTimeout(open, wait);
+        wait = Math.min(wait * 2, 120000);
+      };
+    })();
+  }
+
   function listen() {
     // the last state the TV sent (up to 12 hours back), then live updates
     fetch(RELAY + key + '-phone/json?poll=1&since=12h').then(function (r) { return r.text(); }).then(function (text) {
@@ -124,10 +150,9 @@
         try { var e = JSON.parse(line); if (e.event === 'message') takeState(e.message); } catch (x) { /* skip */ }
       });
     }).catch(function () {}).then(ping);
-    var source = new EventSource(RELAY + key + '-phone/sse');
-    source.onmessage = function (m) {
+    subscribe(RELAY + key + '-phone/sse', function (m) {
       try { var e = JSON.parse(m.data); if (e.event === 'message') takeState(e.message); } catch (x) { /* skip */ }
-    };
+    });
   }
 
   // ---------------------------------------------------------------- status
@@ -185,6 +210,7 @@
     renderQuick();
     renderDock();
     renderWalls();
+    renderPlay();
     setStatus(statusMode);
     askWho();
   }
@@ -204,10 +230,39 @@
     });
   }
 
+  // the Mac helper answered TV Home's last ping (it presses the TV's real keys)
+  function macOn() {
+    return !!(state && state.helperAt && state.at - state.helperAt < 15000);
+  }
+
+  // ---------------------------------------------------------------- remote pad
+  // Keys go to the Mac helper, which presses them on the TV. Taps within a short moment travel as one
+  // message: the free relay allows only about one request every 5 s per home after a short burst.
+  var PAD_GATHER = 250; // ms
+  var padKeys = [], padTimer;
+  function padPress(key) {
+    padKeys.push(key);
+    if (navigator.vibrate) navigator.vibrate(10);
+    if (!padTimer) padTimer = setTimeout(function () {
+      var keys = padKeys.slice(0, 20);
+      padKeys = [];
+      padTimer = null;
+      send({ cmd: 'keys', keys: keys }).catch(function () {});
+    }, PAD_GATHER);
+  }
+
+  var paused = false; // the TV doesn't say whether something plays, so the button alternates
+  function renderPlay() {
+    var b = document.getElementById('pad-play');
+    b.classList.toggle('paused', paused);
+    document.getElementById('pad-play-label').textContent = t(paused ? 'play' : 'pause');
+  }
+
   // ---------------------------------------------------------------- volume
-  // The phone shows a change the moment you make it and sends one level per gesture (at most every
-  // 0.4 s while dragging or holding), not one message per step. The TV's own reports are ignored for a
-  // moment after a local change, so the slider doesn't jump back while the TV catches up.
+  // The phone shows a change the moment you make it and sends one level per gesture: when you let go
+  // (or every 1.2 s while you keep holding). The free relay allows only about one request every 5 s
+  // per home, so it can't take a message per step. The TV's own reports are ignored for a moment after
+  // a local change, so the slider doesn't jump back while the TV catches up.
   var vol = null, muted = false, localUntil = 0;
 
   function renderVolume() {
@@ -225,23 +280,36 @@
     mute.setAttribute('aria-pressed', String(muted));
     document.getElementById('mute-label').textContent = t(muted ? 'muted' : 'mute');
     document.querySelector('.volume').classList.toggle('muted', muted);
+    // the Mac helper presses the TV's real volume keys; TV Home reports when it last answered
+    var hint = document.getElementById('vol-hint');
+    hint.hidden = !state || !('helperAt' in state);
+    if (!hint.hidden) hint.textContent = t(macOn() ? 'volMac' : 'volNoMac');
+    var padNote = document.getElementById('pad-note');
+    padNote.hidden = !state || !('helperAt' in state) || macOn();
+    padNote.textContent = t('padNoMac');
   }
 
-  var volSentAt = 0, volTimer;
+  var VOL_SETTLE = 350;   // ms after the last change before sending
+  var VOL_HOLD_EVERY = 1200;
+  var volTimer, volSentAt = 0, volSentLevel = null;
+  function sendVolumeNow() {
+    clearTimeout(volTimer);
+    if (vol === null || vol === volSentLevel) return;
+    volSentAt = Date.now();
+    volSentLevel = vol;
+    localUntil = Date.now() + 4000;
+    send({ cmd: 'volume', level: vol }).catch(function () { volSentLevel = null; });
+  }
+
   function setVolume(level) {
     if (vol === null) return;
     vol = Math.max(0, Math.min(100, level));
     muted = false;
-    localUntil = Date.now() + 2500;
+    localUntil = Date.now() + 4000;
     renderVolume();
     if (navigator.vibrate) navigator.vibrate(8);
     clearTimeout(volTimer);
-    var wait = Math.max(0, volSentAt + 400 - Date.now());
-    volTimer = setTimeout(function () {
-      volSentAt = Date.now();
-      localUntil = Date.now() + 2500;
-      send({ cmd: 'volume', level: vol }).catch(function () {});
-    }, wait);
+    volTimer = setTimeout(sendVolumeNow, VOL_SETTLE);
   }
 
   // hold − or + to keep stepping, faster after a moment
@@ -253,7 +321,12 @@
       setVolume(vol + step);
       var delay = 380;
       (function again() {
-        repeat = setTimeout(function () { setVolume(vol + step); delay = Math.max(90, delay * 0.7); again(); }, delay);
+        repeat = setTimeout(function () {
+          setVolume(vol + step);
+          if (Date.now() - volSentAt > VOL_HOLD_EVERY) sendVolumeNow(); // keep the TV following a long hold
+          delay = Math.max(90, delay * 0.7);
+          again();
+        }, delay);
       })();
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { button.addEventListener(ev, stop); });
@@ -416,6 +489,15 @@
   });
   document.getElementById('refresh').addEventListener('click', ping);
   document.getElementById('home').addEventListener('click', function () { send({ cmd: 'home' }); });
+  document.querySelectorAll('[data-key]').forEach(function (b) {
+    b.addEventListener('click', function () { padPress(b.getAttribute('data-key')); });
+  });
+  document.getElementById('pad-play').addEventListener('click', function () {
+    padPress(paused ? 'KEY_PLAY' : 'KEY_PAUSE');
+    paused = !paused;
+    renderPlay();
+  });
+
   holdStep(document.getElementById('vol-up'), 1);
   holdStep(document.getElementById('vol-down'), -1);
   document.getElementById('vol-slider').addEventListener('input', function (e) { setVolume(Number(e.target.value)); });

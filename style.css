@@ -294,6 +294,76 @@ input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; bo
   font-size: 26px;
 }
 
+/* ---------------------------------------------------------------- pad */
+.pad {
+  position: relative;
+  width: min(300px, 82vw);
+  aspect-ratio: 1;
+  margin: 8px auto 20px;
+  border-radius: 50%;
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.pad-key {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  touch-action: manipulation;
+}
+
+.pad-key svg { width: 34px; height: 34px; }
+.pad-key:active { background: rgba(255, 255, 255, 0.16); }
+.pad .up { grid-column: 2; grid-row: 1; }
+.pad .left { grid-column: 1; grid-row: 2; }
+.pad .right { grid-column: 3; grid-row: 2; }
+.pad .down { grid-column: 2; grid-row: 3; }
+
+.pad-ok {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 6px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 20px;
+  touch-action: manipulation;
+}
+
+.pad-ok:active { transform: scale(0.94); }
+
+.pad-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+
+.pad-btn {
+  min-height: 64px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  touch-action: manipulation;
+}
+
+.pad-btn:active { background: rgba(255, 255, 255, 0.2); }
+.pad-btn .i-play { display: none; }
+.pad-btn.paused .i-play { display: inline; }
+.pad-btn.paused .i-pause { display: none; }
+.pad-btn svg .i-play { fill: currentColor; }
+
 /* ---------------------------------------------------------------- message */
 .field { margin-bottom: 14px; }
 .label { display: block; font-size: 14px; color: var(--ink-2); margin-bottom: 8px; }
@@ -450,7 +520,7 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   width: calc(100% - 24px);
   max-width: 536px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 6px;
   border-radius: 26px;
   background: rgba(11, 38, 51, 0.72);
