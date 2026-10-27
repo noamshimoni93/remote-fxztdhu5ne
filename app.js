@@ -21,7 +21,8 @@
       dock: 'Dock', dockHint: 'Change the order with the arrows; switch an app off to hide it.',
       save: 'Save to the TV', wallpaper: 'Wallpaper', upload: 'Use one of my photos',
       uploadHint: 'Cropped to the TV’s shape and sent through the relay.', uploading: 'Sending the photo…',
-      tooBig: 'That photo is too big to send', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
+      tooBig: 'That photo is too big to send', whoTitle: 'Who’s using this phone?',
+      whoHint: 'Your name goes with your messages. You can change it on the Message tab.', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
       tabWall: 'Wallpaper', sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay',
       saved: 'Saved', wallSet: 'Wallpaper changed', noKey: 'Open this page from your personal link to connect to the TV.',
       up: 'Move up', down: 'Move down', show: 'Show in the dock', weather: 'Tel Aviv: {w}',
@@ -39,7 +40,8 @@
       dock: 'סרגל האפליקציות', dockHint: 'שינוי הסדר בעזרת החצים; כיבוי אפליקציה מסתיר אותה.',
       save: 'שמירה בטלוויזיה', wallpaper: 'רקע', upload: 'שימוש בתמונה שלי',
       uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'שולח את התמונה…',
-      tooBig: 'התמונה גדולה מדי לשליחה', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
+      tooBig: 'התמונה גדולה מדי לשליחה', whoTitle: 'מי משתמש בטלפון הזה?',
+      whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
       tabWall: 'רקע', sent: 'נשלח', opening: 'פותח את {app}', failed: 'אין חיבור לממסר',
       saved: 'נשמר', wallSet: 'הרקע הוחלף', noKey: 'יש לפתוח את הדף מהקישור האישי כדי להתחבר לטלוויזיה.',
       up: 'הזזה למעלה', down: 'הזזה למטה', show: 'הצגה בסרגל', weather: 'תל אביב: {w}',
@@ -184,6 +186,7 @@
     renderDock();
     renderWalls();
     setStatus(statusMode);
+    askWho();
   }
 
   function renderApps() {
@@ -201,13 +204,74 @@
     });
   }
 
+  // ---------------------------------------------------------------- volume
+  // The phone shows a change the moment you make it and sends one level per gesture (at most every
+  // 0.4 s while dragging or holding), not one message per step. The TV's own reports are ignored for a
+  // moment after a local change, so the slider doesn't jump back while the TV catches up.
+  var vol = null, muted = false, localUntil = 0;
+
   function renderVolume() {
-    var has = state && typeof state.volume === 'number';
-    document.getElementById('vol-num').textContent = has ? state.volume : '–';
+    if (state && typeof state.volume === 'number' && Date.now() > localUntil) {
+      vol = state.volume;
+      muted = !!state.muted;
+    }
+    var slider = document.getElementById('vol-slider');
+    document.getElementById('vol-num').textContent = vol === null ? '–' : muted ? '0' : vol;
+    slider.value = vol === null ? 0 : Math.min(vol, Number(slider.max));
+    slider.style.setProperty('--fill', (slider.value / slider.max * 100) + '%');
+    slider.disabled = vol === null;
     var mute = document.getElementById('mute');
-    var muted = !!(state && state.muted);
-    mute.textContent = t(muted ? 'muted' : 'mute');
     mute.classList.toggle('on', muted);
+    mute.setAttribute('aria-pressed', String(muted));
+    document.getElementById('mute-label').textContent = t(muted ? 'muted' : 'mute');
+    document.querySelector('.volume').classList.toggle('muted', muted);
+  }
+
+  var volSentAt = 0, volTimer;
+  function setVolume(level) {
+    if (vol === null) return;
+    vol = Math.max(0, Math.min(100, level));
+    muted = false;
+    localUntil = Date.now() + 2500;
+    renderVolume();
+    if (navigator.vibrate) navigator.vibrate(8);
+    clearTimeout(volTimer);
+    var wait = Math.max(0, volSentAt + 400 - Date.now());
+    volTimer = setTimeout(function () {
+      volSentAt = Date.now();
+      localUntil = Date.now() + 2500;
+      send({ cmd: 'volume', level: vol }).catch(function () {});
+    }, wait);
+  }
+
+  // hold − or + to keep stepping, faster after a moment
+  function holdStep(button, step) {
+    var repeat;
+    function stop() { clearTimeout(repeat); }
+    button.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      setVolume(vol + step);
+      var delay = 380;
+      (function again() {
+        repeat = setTimeout(function () { setVolume(vol + step); delay = Math.max(90, delay * 0.7); again(); }, delay);
+      })();
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { button.addEventListener(ev, stop); });
+    button.addEventListener('click', function (e) { if (e.detail === 0) setVolume(vol + step); }); // keyboard
+  }
+
+  function askWho() {
+    var list = names();
+    var sheet = document.getElementById('sheet');
+    if (me || !list.length) { sheet.hidden = true; return; }
+    var box = document.getElementById('sheet-names');
+    box.innerHTML = '';
+    list.forEach(function (name) {
+      var b = el('button', { type: 'button' }, name);
+      b.addEventListener('click', function () { me = name; save('me', me); sheet.hidden = true; renderWho(); });
+      box.appendChild(b);
+    });
+    sheet.hidden = false;
   }
 
   function renderWho() {
@@ -225,7 +289,7 @@
     box.innerHTML = '';
     ['quick1', 'quick2', 'quick3', 'quick4'].forEach(function (k) {
       var c = el('button', { type: 'button', 'class': 'chip' }, t(k));
-      c.addEventListener('click', function () { document.getElementById('msg').value = t(k); });
+      c.addEventListener('click', function () { var box = document.getElementById('msg'); box.value = t(k); box.focus(); });
       box.appendChild(c);
     });
   }
@@ -352,14 +416,26 @@
   });
   document.getElementById('refresh').addEventListener('click', ping);
   document.getElementById('home').addEventListener('click', function () { send({ cmd: 'home' }); });
-  document.getElementById('vol-up').addEventListener('click', function () { send({ cmd: 'volume', dir: 'up' }); });
-  document.getElementById('vol-down').addEventListener('click', function () { send({ cmd: 'volume', dir: 'down' }); });
-  document.getElementById('mute').addEventListener('click', function () { send({ cmd: 'volume', dir: 'mute' }); });
-  document.getElementById('send').addEventListener('click', function () {
+  holdStep(document.getElementById('vol-up'), 1);
+  holdStep(document.getElementById('vol-down'), -1);
+  document.getElementById('vol-slider').addEventListener('input', function (e) { setVolume(Number(e.target.value)); });
+  document.getElementById('mute').addEventListener('click', function () {
+    if (vol === null) return;
+    muted = !muted;
+    localUntil = Date.now() + 2500;
+    renderVolume();
+    send({ cmd: 'volume', mute: muted }).catch(function () {});
+  });
+
+  function sendMessage() {
     var box = document.getElementById('msg');
     var text = box.value.trim();
     if (!text) return box.focus();
     send({ cmd: 'message', text: text }).then(function () { box.value = ''; toast(t('sent')); });
+  }
+  document.getElementById('send').addEventListener('click', sendMessage);
+  document.getElementById('msg').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(); }
   });
   document.getElementById('dock-save').addEventListener('click', function () {
     if (!draft) return;

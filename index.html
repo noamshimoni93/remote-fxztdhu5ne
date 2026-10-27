@@ -51,13 +51,22 @@
       </div>
       <h2 data-t="volume">Volume</h2>
       <div class="volume glass">
-        <button type="button" id="vol-down" aria-label="Volume down">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
-        </button>
-        <div class="vol-read"><span id="vol-num">–</span><button type="button" id="mute" class="mute" data-t="mute">Mute</button></div>
-        <button type="button" id="vol-up" aria-label="Volume up">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
+        <div class="vol-top">
+          <button type="button" id="mute" class="mute" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="waves" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="cross" d="M17 9l5 6M22 9l-5 6"/></svg>
+            <span id="mute-label">Mute</span>
+          </button>
+          <span class="vol-num" id="vol-num">–</span>
+        </div>
+        <div class="vol-row">
+          <button type="button" class="step" id="vol-down" aria-label="Volume down">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+          </button>
+          <input type="range" id="vol-slider" min="0" max="50" step="1" value="0" aria-label="Volume">
+          <button type="button" class="step" id="vol-up" aria-label="Volume up">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -70,7 +79,7 @@
       </div>
       <div class="field">
         <label class="label" for="msg" data-t="message">Message</label>
-        <textarea id="msg" maxlength="280" rows="3"></textarea>
+        <textarea id="msg" maxlength="280" rows="3" enterkeyhint="send"></textarea>
       </div>
       <div class="chips" id="quick"></div>
       <button class="primary" id="send" type="button" data-t="send">Send to the TV</button>
@@ -118,6 +127,14 @@
   </nav>
 
   <div class="toast" id="toast" role="status"></div>
+
+  <div class="sheet-back" id="sheet" hidden>
+    <div class="sheet glass" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <h2 id="sheet-title" data-t="whoTitle">Who's using this phone?</h2>
+      <div class="sheet-names" id="sheet-names"></div>
+      <p class="hint" data-t="whoHint">Your name goes with your messages. You can change it on the Message tab.</p>
+    </div>
+  </div>
 
   <div class="nokey" id="nokey" hidden>
     <h1 class="brand">TV</h1>
