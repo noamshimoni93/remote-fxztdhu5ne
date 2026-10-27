@@ -132,11 +132,13 @@
   function subscribe(url, onMessage) {
     var wait = 5000;
     (function open() {
+      var openedAt = Date.now();
       var source = new EventSource(url);
-      source.onopen = function () { wait = 5000; };
-      source.onmessage = function (m) { wait = 5000; onMessage(m); };
+      source.onmessage = onMessage;
       source.onerror = function () {
         source.close();
+        // a connection the relay dropped quickly doesn't count as working: keep backing off
+        if (Date.now() - openedAt > 60000) wait = 5000;
         setTimeout(open, wait);
         wait = Math.min(wait * 2, 120000);
       };
