@@ -14,7 +14,7 @@
       remote: 'Remote', connecting: 'Connecting…', tvOn: 'TV is on', tvOff: 'TV is off or asleep',
       showing: 'Showing: {what}', homeScreen: 'TV Home', otherApp: 'another app', lastSeen: 'Last seen {when}',
       neverSeen: 'Not heard from yet', justNow: 'just now', minutesAgo: '{n} min ago', hoursAgo: '{n} h ago',
-      open: 'Open on the TV', home: 'TV Home', volume: 'Volume', mute: 'Mute', muted: 'Muted',
+      open: 'Open on the TV', home: 'TV Home', volume: 'Volume', mute: 'Mute',
       sendMessage: 'Send a message to the TV', from: 'From', message: 'Message', send: 'Send to the TV',
       messageHint: 'It shows on the TV for 12 seconds, even over Netflix, then goes back.',
       quick1: 'Dinner’s ready', quick2: 'On my way home', quick3: 'Movie night?', quick4: 'Love you',
@@ -22,11 +22,11 @@
       save: 'Save to the TV', wallpaper: 'Wallpaper', upload: 'Use one of my photos',
       uploadHint: 'Cropped to the TV’s shape and sent through the relay.', uploading: 'Sending the photo…',
       tooBig: 'That photo is too big to send', whoTitle: 'Who’s using this phone?',
-      volMac: 'Presses the TV’s own volume keys, through the Mac.',
+      volMac: 'Each tap is one press of the TV’s own volume key, through the Mac; hold to keep going. The TV shows the level on screen.',
       padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', samsungHome: 'Home', tabPad: 'Pad',
       padHint: 'Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.',
       padNoMac: 'The keys are pressed by the Mac. It’s asleep or off right now, so they won’t reach the TV.',
-      powerOn: 'Turn the TV on', powerOff: 'Turn the TV off', turningOn: 'Turning the TV on…',
+      powerOn: 'Turn the TV on', powerOff: 'Turn the TV off', turningOn: 'Turning the TV on…', stillOff: 'The TV hasn’t come on yet',
       turningOff: 'Turning the TV off…', homeClosed: 'TV Home isn’t open', rewind: 'Rewind', forward: 'Forward',
       volNoMac: 'The Mac is asleep or off, so volume and the pad won’t reach the TV right now.',
       whoHint: 'Your name goes with your messages. You can change it on the Message tab.', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
@@ -40,7 +40,7 @@
       remote: 'שלט', connecting: 'מתחבר…', tvOn: 'הטלוויזיה דולקת', tvOff: 'הטלוויזיה כבויה או במצב שינה',
       showing: 'מוצג: {what}', homeScreen: 'מסך הבית', otherApp: 'אפליקציה אחרת', lastSeen: 'נראתה לאחרונה {when}',
       neverSeen: 'עדיין אין תשובה', justNow: 'עכשיו', minutesAgo: 'לפני {n} דק׳', hoursAgo: 'לפני {n} שע׳',
-      open: 'פתיחה בטלוויזיה', home: 'מסך הבית', volume: 'עוצמת קול', mute: 'השתקה', muted: 'מושתק',
+      open: 'פתיחה בטלוויזיה', home: 'מסך הבית', volume: 'עוצמת קול', mute: 'השתקה',
       sendMessage: 'שליחת הודעה לטלוויזיה', from: 'מאת', message: 'הודעה', send: 'שליחה לטלוויזיה',
       messageHint: 'ההודעה מוצגת בטלוויזיה 12 שניות, גם מעל נטפליקס, ואז חוזרים.',
       quick1: 'האוכל מוכן', quick2: 'בדרך הביתה', quick3: 'ערב סרט?', quick4: 'אוהב אותך',
@@ -48,11 +48,11 @@
       save: 'שמירה בטלוויזיה', wallpaper: 'רקע', upload: 'שימוש בתמונה שלי',
       uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'שולח את התמונה…',
       tooBig: 'התמונה גדולה מדי לשליחה', whoTitle: 'מי משתמש בטלפון הזה?',
-      volMac: 'לוחץ על מקשי עוצמת הקול של הטלוויזיה עצמה, דרך המק.',
+      volMac: 'כל הקשה היא לחיצה אחת על מקש עוצמת הקול של הטלוויזיה, דרך המק; לחיצה ממושכת ממשיכה. הרמה מוצגת על מסך הטלוויזיה.',
       padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', samsungHome: 'בית', tabPad: 'שלט',
       padHint: 'עובד בתוך נטפליקס, Apple TV ושאר האפליקציות, כמו השלט של הטלוויזיה. לחיצות מהירות נשלחות יחד, כך שלחיצה יכולה להתעכב רגע.',
       padNoMac: 'את המקשים לוחץ המק. כרגע הוא כבוי או במצב שינה, ולכן הם לא יגיעו לטלוויזיה.',
-      powerOn: 'הדלקת הטלוויזיה', powerOff: 'כיבוי הטלוויזיה', turningOn: 'הטלוויזיה נדלקת…',
+      powerOn: 'הדלקת הטלוויזיה', powerOff: 'כיבוי הטלוויזיה', turningOn: 'הטלוויזיה נדלקת…', stillOff: 'הטלוויזיה עדיין לא נדלקה',
       turningOff: 'הטלוויזיה נכבית…', homeClosed: 'מסך הבית לא פתוח', rewind: 'אחורה', forward: 'קדימה',
       volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול והשלט לא יגיעו לטלוויזיה כרגע.',
       whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
@@ -101,14 +101,28 @@
   var pingAt = 0;
   var pingTimer;
 
-  function send(command) {
+  // `from`: the control(s) tapped; they light up with a tick once the relay has the command, or
+  // shake when it couldn't be sent
+  function send(command, from) {
     command.v = 1;
     if (me) command.from = me;
     return fetch(RELAY + key + '-tv', { method: 'POST', body: JSON.stringify(command) }).then(function (r) {
       if (!r.ok) throw new Error(r.status);
+      mark(from, 'sent');
     }).catch(function () {
+      mark(from, 'unsent');
       toast(t('failed'));
       throw new Error('relay');
+    });
+  }
+
+  function mark(from, how) {
+    [].concat(from || []).forEach(function (b) {
+      b.classList.remove('sent', 'unsent');
+      void b.offsetWidth; // restart the animation on a repeat tap
+      b.classList.add(how);
+      clearTimeout(b.markTimer);
+      b.markTimer = setTimeout(function () { b.classList.remove(how); }, 1100);
     });
   }
 
@@ -233,16 +247,37 @@
     askWho();
   }
 
+  // the same icons as the dock on the TV (TV Home's icons/), by app name; others get their initial
+  var ICONS = {
+    'PlayStation 5': 'ps5.svg', 'Netflix': 'netflix.svg', 'Apple TV': 'appletv.svg', 'Prime Video': 'prime.svg',
+    'Disney+': 'disney.png', 'Partner TV+': 'partner.png', 'Stremio': 'stremio.png', 'YouTube': 'youtube.svg',
+    'Spotify': 'spotify.svg'
+  };
+  var CONTAIN = { 'Stremio': true }; // a logo with its own margin, drawn smaller on a dark square like on the TV
+
+  function appIcon(app, cls) {
+    var tile = el('span', { 'class': cls + (isLight(app.rgb) ? ' light' : '') + (CONTAIN[app.label] ? ' contain' : ''), 'aria-hidden': 'true' });
+    tile.style.setProperty('--rgb', app.rgb);
+    if (ICONS[app.label]) {
+      var img = el('img', { src: 'icons/' + ICONS[app.label], alt: '' });
+      img.onerror = function () { tile.textContent = app.label.charAt(0); };
+      tile.appendChild(img);
+    } else {
+      tile.textContent = app.label.charAt(0);
+    }
+    return tile;
+  }
+
   function renderApps() {
     var box = document.getElementById('apps');
     box.innerHTML = '';
     ((state && state.apps) || []).forEach(function (app) {
-      var b = el('button', { type: 'button', 'class': 'app-btn' + (app.hidden ? ' off' : '') + (isLight(app.rgb) ? ' light' : '') });
-      b.style.setProperty('--rgb', app.rgb);
-      b.appendChild(el('span', { 'class': 'tile', 'aria-hidden': 'true' }, app.label.charAt(0)));
-      b.appendChild(el('span', { 'class': 'name' }, app.label));
+      var b = el('button', { type: 'button', 'class': 'app-btn' + (app.hidden ? ' off' : '') });
+      var tile = appIcon(app, 'tile');
+      b.appendChild(tile);
+      b.appendChild(el('span', { 'class': 'name', dir: 'auto' }, app.label)); // "Disney+" stays "Disney+" in Hebrew
       b.addEventListener('click', function () {
-        send({ cmd: 'open', app: app.label }).then(function () { toast(t('opening', { app: app.label })); });
+        send({ cmd: 'open', app: app.label }, tile).then(function () { toast(t('opening', { app: app.label })); });
       });
       box.appendChild(b);
     });
@@ -276,15 +311,17 @@
   // Keys go to the Mac helper, which presses them on the TV. Taps within a short moment travel as one
   // message: the free relay allows only about one request every 5 s per home after a short burst.
   var PAD_GATHER = 250; // ms
-  var padKeys = [], padTimer;
-  function padPress(key) {
+  var padKeys = [], padButtons = [], padTimer;
+  function padPress(key, button) {
     padKeys.push(key);
+    if (padButtons.indexOf(button) < 0) padButtons.push(button);
     if (navigator.vibrate) navigator.vibrate(10);
     if (!padTimer) padTimer = setTimeout(function () {
-      var keys = padKeys.slice(0, 20);
+      var keys = padKeys.slice(0, 20), buttons = padButtons;
       padKeys = [];
+      padButtons = [];
       padTimer = null;
-      send({ cmd: 'keys', keys: keys }).catch(function () {});
+      send({ cmd: 'keys', keys: keys }, buttons).catch(function () {});
     }, PAD_GATHER);
   }
 
@@ -296,29 +333,17 @@
   }
 
   // ---------------------------------------------------------------- volume
-  // Volume is the TV's own volume keys, pressed by the Mac helper: a change from 10 to 14 is four
-  // KEY_VOLUP presses, sent as one message when you let go (or every 1.2 s while you keep holding);
-  // the free relay allows only about one request every 5 s per home. The phone shows the change at
-  // once; the TV's reports are ignored for a moment so the slider doesn't jump back meanwhile.
-  var vol = null, muted = false, localUntil = 0;
-  var volSent = null; // the volume the keys sent so far will leave the TV at
+  // Volume is the TV's own volume keys, pressed by the Mac helper. The level itself can't be read (the
+  // sound doesn't go through the TV's own volume), so the phone shows only the steps it sends: taps
+  // within a moment travel as one message (or every 1.2 s while you keep holding), since the free
+  // relay allows only about one request every 5 s per home.
+  var volPending = 0;   // steps not sent yet
+  var volBurst = 0;     // steps of the current run of taps, shown as "+3"
+  var VOL_SETTLE = 350; // ms after the last tap before sending
+  var VOL_HOLD_EVERY = 1200;
+  var volTimer, volSentAt = 0, burstTimer, volButtons = [];
 
   function renderVolume() {
-    if (state && typeof state.volume === 'number' && Date.now() > localUntil) {
-      vol = volSent = state.volume;
-      muted = !!state.muted;
-    }
-    var slider = document.getElementById('vol-slider');
-    document.getElementById('vol-num').textContent = vol === null ? '–' : muted ? '0' : vol;
-    slider.value = vol === null ? 0 : Math.min(vol, Number(slider.max));
-    slider.style.setProperty('--fill', (slider.value / slider.max * 100) + '%');
-    slider.disabled = vol === null;
-    var mute = document.getElementById('mute');
-    mute.classList.toggle('on', muted);
-    mute.setAttribute('aria-pressed', String(muted));
-    document.getElementById('mute-label').textContent = t(muted ? 'muted' : 'mute');
-    document.querySelector('.volume').classList.toggle('muted', muted);
-    // the Mac helper presses the TV's real volume keys; TV Home reports when it last answered
     var hint = document.getElementById('vol-hint');
     hint.hidden = !state || !('helperAt' in state);
     if (!hint.hidden) hint.textContent = t(macOn() ? 'volMac' : 'volNoMac');
@@ -327,30 +352,37 @@
     padNote.textContent = t('padNoMac');
   }
 
-  var VOL_SETTLE = 350;   // ms after the last change before sending
-  var VOL_HOLD_EVERY = 1200;
-  var volTimer, volSentAt = 0;
-  function sendVolumeNow() {
-    clearTimeout(volTimer);
-    if (vol === null || volSent === null || vol === volSent) return;
-    var diff = vol - volSent;
-    var keys = [];
-    for (var i = 0; i < Math.min(Math.abs(diff), 50); i++) keys.push(diff > 0 ? 'KEY_VOLUP' : 'KEY_VOLDOWN');
-    volSentAt = Date.now();
-    volSent = vol;
-    localUntil = Date.now() + 4000;
-    send({ cmd: 'keys', keys: keys }).catch(function () {});
+  function showBurst() {
+    var box = document.getElementById('vol-burst');
+    box.textContent = volBurst > 0 ? '+' + volBurst : volBurst < 0 ? '\u2212' + -volBurst : '';
+    box.classList.add('on');
   }
 
-  function setVolume(level) {
-    if (vol === null) return;
-    vol = Math.max(0, Math.min(100, level));
-    muted = false;
-    localUntil = Date.now() + 4000;
-    renderVolume();
+  function sendVolumeNow() {
+    clearTimeout(volTimer);
+    if (!volPending) return;
+    var keys = [];
+    for (var i = 0; i < Math.min(Math.abs(volPending), 50); i++) keys.push(volPending > 0 ? 'KEY_VOLUP' : 'KEY_VOLDOWN');
+    var buttons = volButtons;
+    volPending = 0;
+    volButtons = [];
+    volSentAt = Date.now();
+    send({ cmd: 'keys', keys: keys }, buttons).catch(function () {});
+  }
+
+  function volStep(step, button) {
+    volPending += step;
+    if (volButtons.indexOf(button) < 0) volButtons.push(button);
+    volBurst += step;
+    showBurst();
     if (navigator.vibrate) navigator.vibrate(8);
     clearTimeout(volTimer);
     volTimer = setTimeout(sendVolumeNow, VOL_SETTLE);
+    clearTimeout(burstTimer);
+    burstTimer = setTimeout(function () { // a new run of taps starts counting from zero
+      volBurst = 0;
+      document.getElementById('vol-burst').classList.remove('on');
+    }, 2200);
   }
 
   // hold − or + to keep stepping, faster after a moment
@@ -359,11 +391,11 @@
     function stop() { clearTimeout(repeat); }
     button.addEventListener('pointerdown', function (e) {
       e.preventDefault();
-      setVolume(vol + step);
+      volStep(step, button);
       var delay = 380;
       (function again() {
         repeat = setTimeout(function () {
-          setVolume(vol + step);
+          volStep(step, button);
           if (Date.now() - volSentAt > VOL_HOLD_EVERY) sendVolumeNow(); // keep the TV following a long hold
           delay = Math.max(90, delay * 0.7);
           again();
@@ -371,7 +403,7 @@
       })();
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { button.addEventListener(ev, stop); });
-    button.addEventListener('click', function (e) { if (e.detail === 0) setVolume(vol + step); }); // keyboard
+    button.addEventListener('click', function (e) { if (e.detail === 0) volStep(step, button); }); // keyboard
   }
 
   function askWho() {
@@ -417,10 +449,8 @@
     list.innerHTML = '';
     draft.forEach(function (app, i) {
       var row = el('li', { 'class': 'dock-row' + (app.hidden ? ' off' : '') });
-      var sw = el('span', { 'class': 'swatch', 'aria-hidden': 'true' });
-      sw.style.setProperty('--rgb', app.rgb);
-      row.appendChild(sw);
-      row.appendChild(el('span', { 'class': 'dname' }, app.label));
+      row.appendChild(appIcon(app, 'swatch'));
+      row.appendChild(el('span', { 'class': 'dname', dir: 'auto' }, app.label));
       [['up', -1, 'M6 15l6-6 6 6'], ['down', 1, 'M6 9l6 6 6-6']].forEach(function (m) {
         var b = el('button', { type: 'button', 'class': 'move', 'aria-label': t(m[0]) + ': ' + app.label });
         b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + m[2] + '"/></svg>';
@@ -459,7 +489,7 @@
       b.style.background = WALL_LOOKS[name] || WALL_LOOKS.custom;
       b.appendChild(el('span', {}, t(name)));
       if (name !== 'custom') {
-        b.addEventListener('click', function () { send({ cmd: 'wallpaper', name: name }).then(function () { toast(t('wallSet')); }); });
+        b.addEventListener('click', function () { send({ cmd: 'wallpaper', name: name }, b).then(function () { toast(t('wallSet')); }); });
       }
       box.appendChild(b);
     });
@@ -528,44 +558,43 @@
     try { localStorage.setItem('tvremote.lang', lang); } catch (e) { /* storage unavailable */ }
     applyLanguage();
   });
-  document.getElementById('refresh').addEventListener('click', ping);
-  document.getElementById('home').addEventListener('click', function () { send({ cmd: 'home' }); });
-  document.querySelectorAll('[data-key]').forEach(function (b) {
-    b.addEventListener('click', function () { padPress(b.getAttribute('data-key')); });
+  document.getElementById('refresh').addEventListener('click', function () { mark(this, 'spin'); ping(); });
+  ['home', 'pad-home'].forEach(function (id) {
+    document.getElementById(id).addEventListener('click', function () {
+      if (navigator.vibrate) navigator.vibrate(10);
+      send({ cmd: 'home' }, this).catch(function () {});
+    });
   });
-  document.getElementById('pad-home').addEventListener('click', function () {
-    if (navigator.vibrate) navigator.vibrate(10);
-    send({ cmd: 'home' }).catch(function () {});
+  document.querySelectorAll('[data-key]').forEach(function (b) {
+    b.addEventListener('click', function () { padPress(b.getAttribute('data-key'), b); });
   });
   document.getElementById('power').addEventListener('click', function () {
     var on = !tvIsOn();
-    send({ cmd: 'power', on: on }).then(function () {
+    send({ cmd: 'power', on: on }, this).then(function () {
       toast(t(on ? 'turningOn' : 'turningOff'));
-      setTimeout(ping, on ? 12000 : 5000); // then ask again how things are
+      // then ask how things are; from deep sleep the TV can take a few seconds more
+      setTimeout(ping, on ? 8000 : 5000);
+      if (on) setTimeout(function () { if (!tvIsOn()) { toast(t('stillOff')); ping(); } }, 20000);
     }).catch(function () {});
   });
   document.getElementById('pad-play').addEventListener('click', function () {
-    padPress(paused ? 'KEY_PLAY' : 'KEY_PAUSE');
+    padPress(paused ? 'KEY_PLAY' : 'KEY_PAUSE', this);
     paused = !paused;
     renderPlay();
   });
 
   holdStep(document.getElementById('vol-up'), 1);
   holdStep(document.getElementById('vol-down'), -1);
-  document.getElementById('vol-slider').addEventListener('input', function (e) { setVolume(Number(e.target.value)); });
   document.getElementById('mute').addEventListener('click', function () {
-    if (vol === null) return;
-    muted = !muted; // the remote's Mute key toggles
-    localUntil = Date.now() + 4000;
-    renderVolume();
-    send({ cmd: 'keys', keys: ['KEY_MUTE'] }).catch(function () {});
+    if (navigator.vibrate) navigator.vibrate(10);
+    send({ cmd: 'keys', keys: ['KEY_MUTE'] }, this).catch(function () {}); // the remote's Mute key toggles
   });
 
   function sendMessage() {
     var box = document.getElementById('msg');
     var text = box.value.trim();
     if (!text) return box.focus();
-    send({ cmd: 'message', text: text }).then(function () { box.value = ''; toast(t('sent')); });
+    send({ cmd: 'message', text: text }, document.getElementById('send')).then(function () { box.value = ''; toast(t('sent')); });
   }
   document.getElementById('send').addEventListener('click', sendMessage);
   document.getElementById('msg').addEventListener('keydown', function (e) {
@@ -577,7 +606,7 @@
       cmd: 'dock',
       order: draft.map(function (a) { return a.label; }),
       hidden: draft.filter(function (a) { return a.hidden; }).map(function (a) { return a.label; })
-    }).then(function () { toast(t('saved')); });
+    }, document.getElementById('dock-save')).then(function () { toast(t('saved')); });
   });
   document.getElementById('upload').addEventListener('change', function (e) {
     if (e.target.files[0]) uploadPhoto(e.target.files[0]);

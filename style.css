@@ -81,16 +81,16 @@ button { cursor: pointer; }
 .status {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 12px 12px 16px;
-  border-radius: 20px;
-  margin-bottom: 20px;
+  gap: 10px;
+  padding: 4px 4px 4px 14px;
+  border-radius: 16px;
+  margin-bottom: 16px;
 }
 
 .dot {
   flex: none;
-  width: 12px;
-  height: 12px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--off);
 }
@@ -98,18 +98,23 @@ button { cursor: pointer; }
 .dot.on { background: var(--on); box-shadow: 0 0 12px var(--on); }
 .dot.wait { background: #e6c35c; animation: pulse 1.2s ease-in-out infinite; }
 
-.status-text { flex: 1; min-width: 0; }
-.status-main { font-weight: 600; }
-.status-sub { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+.status-text { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.status-main { flex: none; font-size: 14px; font-weight: 600; }
+.status-sub { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 13px; color: var(--ink-2); }
+.status-sub:not(:empty)::before { content: "·"; margin-inline-end: 6px; }
 
 .refresh {
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 0;
   background: transparent;
+  color: var(--ink-2);
 }
+
+.refresh svg { width: 18px; height: 18px; }
+.refresh.spin svg { animation: spin 0.6s ease-out; }
 
 svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -141,22 +146,42 @@ h2 {
   background: transparent;
 }
 
-.app-btn .tile {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+/* app icons: the TV dock's own icons, same corner rounding (a quarter of the side) */
+.tile,
+.swatch {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--serif);
-  font-size: 30px;
   background: rgb(var(--rgb));
   color: #fff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.tile img,
+.swatch img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.tile.light,
+.swatch.light { color: #111; }
+.tile.contain,
+.swatch.contain { background: #19173a; }
+.tile.contain img,
+.swatch.contain img { object-fit: contain; box-sizing: border-box; padding: 14%; }
+
+.app-btn .tile {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  font-family: var(--serif);
+  font-size: 30px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s;
 }
 
-.app-btn.light .tile { color: #111; }
 .app-btn:active .tile { transform: scale(0.92); }
 .app-btn.off { opacity: 0.45; }
 .app-btn .name { font-size: 13px; text-align: center; color: var(--ink-2); }
@@ -186,7 +211,16 @@ h2 {
   margin-bottom: 8px;
 }
 
-.vol-num { font-family: var(--serif); font-size: 44px; line-height: 1; padding: 0 6px; }
+.vol-burst {
+  font-family: var(--serif);
+  font-size: 36px;
+  line-height: 1;
+  padding: 0 6px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.vol-burst.on { opacity: 1; }
 
 .mute {
   min-height: 44px;
@@ -200,17 +234,10 @@ h2 {
   font-weight: 600;
 }
 
-.mute .cross { display: none; }
-.mute.on { background: #ffb4a8; border-color: #ffb4a8; color: #3a1510; }
-.mute.on .cross { display: inline; }
-.mute.on .waves { display: none; }
-
-.vol-row { display: flex; align-items: center; gap: 10px; }
+.vol-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 
 .step {
-  flex: none;
-  width: 56px;
-  height: 56px;
+  height: 64px;
   border-radius: 16px;
   border: 0;
   background: rgba(255, 255, 255, 0.1);
@@ -220,41 +247,7 @@ h2 {
 }
 
 .step:active { background: rgba(255, 255, 255, 0.24); }
-
-input[type="range"] {
-  flex: 1;
-  min-width: 0;
-  height: 44px;
-  margin: 0;
-  background: transparent;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  height: 10px;
-  border-radius: 5px;
-  background: linear-gradient(90deg, var(--ink) var(--fill, 0%), rgba(255, 255, 255, 0.2) var(--fill, 0%));
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 30px;
-  height: 30px;
-  margin-top: -10px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-}
-
-input[type="range"]::-moz-range-track { height: 10px; border-radius: 5px; background: rgba(255, 255, 255, 0.2); }
-input[type="range"]::-moz-range-progress { height: 10px; border-radius: 5px; background: var(--ink); }
-input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; border-radius: 50%; background: #fff; }
-[dir="rtl"] input[type="range"]::-webkit-slider-runnable-track {
-  background: linear-gradient(270deg, var(--ink) var(--fill, 0%), rgba(255, 255, 255, 0.2) var(--fill, 0%));
-}
-
-.volume.muted input[type="range"] { opacity: 0.45; }
+.step svg { width: 28px; height: 28px; }
 
 /* ---------------------------------------------------------------- who's using this phone */
 .sheet-back {
@@ -438,8 +431,9 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   border: 1px solid var(--glass-edge);
 }
 
-.dock-row .swatch { width: 28px; height: 28px; border-radius: 8px; background: rgb(var(--rgb)); flex: none; }
+.dock-row .swatch { width: 32px; height: 32px; border-radius: 8px; flex: none; font-weight: 700; }
 .dock-row .dname { flex: 1; min-width: 0; font-weight: 600; }
+[dir="rtl"] .dock-row .dname { text-align: right; } /* the name itself reads left to right */
 .dock-row.off .dname { opacity: 0.5; }
 
 .dock-row .move {
@@ -596,4 +590,51 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* ---------------------------------------------------------------- tap feedback
+   A press shrinks the control at once; when the relay has the command it glows and shows a tick,
+   and when it couldn't be sent it shakes with a red edge (plus the "couldn't reach" toast). */
+.big, .power, .mute, .primary, .pad-btn, .step, .wall, .chip {
+  transition: transform 0.12s, background-color 0.15s;
+}
+
+.big:active, .power:active, .mute:active, .primary:active, .pad-btn:active, .step:active, .wall:active, .chip:active {
+  transform: scale(0.96);
+}
+
+.sent, .unsent { position: relative; }
+.sent { animation: sent-glow 0.9s ease-out; }
+.unsent { animation: shake 0.35s; box-shadow: 0 0 0 2px #ff8a7a; }
+
+.sent:not(.wall)::after {
+  content: "✓";
+  position: absolute;
+  top: -7px;
+  inset-inline-end: -7px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font: 700 13px/22px var(--sans);
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  animation: tick 1.1s ease-out forwards;
+}
+
+@keyframes sent-glow {
+  0% { box-shadow: 0 0 0 0 rgba(95, 212, 196, 0.9); }
+  100% { box-shadow: 0 0 0 12px rgba(95, 212, 196, 0); }
+}
+
+@keyframes tick {
+  0% { opacity: 0; transform: scale(0.4); }
+  15% { opacity: 1; transform: scale(1.12); }
+  25% { transform: scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 50% { opacity: 0.4; } }
