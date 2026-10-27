@@ -75,6 +75,10 @@
     <section class="panel" id="panel-pad" hidden>
       <h2 data-t="padTitle">Remote keys</h2>
       <p class="hint" id="pad-note" hidden></p>
+      <button type="button" class="power glass" id="power">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+        <span id="power-label">Turn the TV on</span>
+      </button>
       <div class="pad">
         <button type="button" class="pad-key up" data-key="KEY_UP" aria-label="Up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
         <button type="button" class="pad-key left" data-key="KEY_LEFT" aria-label="Left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -82,18 +86,28 @@
         <button type="button" class="pad-key right" data-key="KEY_RIGHT" aria-label="Right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         <button type="button" class="pad-key down" data-key="KEY_DOWN" aria-label="Down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       </div>
-      <div class="pad-row">
+      <div class="pad-row two">
         <button type="button" class="pad-btn glass" data-key="KEY_RETURN">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14l-5-5 5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
           <span data-t="back">Back</span>
+        </button>
+        <button type="button" class="pad-btn glass" data-key="KEY_HOME">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10"/></svg>
+          <span data-t="samsungHome">Home</span>
+        </button>
+      </div>
+      <div class="pad-row">
+        <button type="button" class="pad-btn glass" data-key="KEY_REWIND" id="rewind">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6l-7 6 7 6zM20 6l-7 6 7 6z"/></svg>
+          <span data-t="rewind">Rewind</span>
         </button>
         <button type="button" class="pad-btn glass" id="pad-play">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 5v14l11-7z"/><path class="i-pause" d="M8 5v14M16 5v14"/></svg>
           <span id="pad-play-label" data-t="pause">Pause</span>
         </button>
-        <button type="button" class="pad-btn glass" data-key="KEY_HOME">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10"/></svg>
-          <span data-t="samsungHome">Home</span>
+        <button type="button" class="pad-btn glass" data-key="KEY_FF" id="forward">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 6l7 6-7 6zM4 6l7 6-7 6z"/></svg>
+          <span data-t="forward">Forward</span>
         </button>
       </div>
       <p class="hint" data-t="padHint">Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.</p>

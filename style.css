@@ -343,7 +343,22 @@ input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; bo
 
 .pad-ok:active { transform: scale(0.94); }
 
-.pad-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.pad-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.pad-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.power {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.power.on { background: rgba(255, 180, 168, 0.18); border-color: rgba(255, 180, 168, 0.5); }
+.power:disabled { opacity: 0.5; }
 
 .pad-btn {
   min-height: 64px;
@@ -363,6 +378,7 @@ input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; bo
 .pad-btn.paused .i-play { display: inline; }
 .pad-btn.paused .i-pause { display: none; }
 .pad-btn svg .i-play { fill: currentColor; }
+#rewind svg path, #forward svg path { fill: currentColor; }
 
 /* ---------------------------------------------------------------- message */
 .field { margin-bottom: 14px; }

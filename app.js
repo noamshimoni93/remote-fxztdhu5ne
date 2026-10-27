@@ -26,6 +26,8 @@
       padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', samsungHome: 'Home', tabPad: 'Pad',
       padHint: 'Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.',
       padNoMac: 'The keys are pressed by the Mac. It’s asleep or off right now, so they won’t reach the TV.',
+      powerOn: 'Turn the TV on', powerOff: 'Turn the TV off', turningOn: 'Turning the TV on…',
+      turningOff: 'Turning the TV off…', homeClosed: 'TV Home isn’t open', rewind: 'Rewind', forward: 'Forward',
       volNoMac: 'The Mac is asleep or off, so volume and the pad won’t reach the TV right now.',
       whoHint: 'Your name goes with your messages. You can change it on the Message tab.', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
       tabWall: 'Wallpaper', sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay',
@@ -50,6 +52,8 @@
       padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', samsungHome: 'בית', tabPad: 'שלט',
       padHint: 'עובד בתוך נטפליקס, Apple TV ושאר האפליקציות, כמו השלט של הטלוויזיה. לחיצות מהירות נשלחות יחד, כך שלחיצה יכולה להתעכב רגע.',
       padNoMac: 'את המקשים לוחץ המק. כרגע הוא כבוי או במצב שינה, ולכן הם לא יגיעו לטלוויזיה.',
+      powerOn: 'הדלקת הטלוויזיה', powerOff: 'כיבוי הטלוויזיה', turningOn: 'הטלוויזיה נדלקת…',
+      turningOff: 'הטלוויזיה נכבית…', homeClosed: 'מסך הבית לא פתוח', rewind: 'אחורה', forward: 'קדימה',
       volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול והשלט לא יגיעו לטלוויזיה כרגע.',
       whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
       tabWall: 'רקע', sent: 'נשלח', opening: 'פותח את {app}', failed: 'אין חיבור לממסר',
@@ -152,8 +156,15 @@
         try { var e = JSON.parse(line); if (e.event === 'message') takeState(e.message); } catch (x) { /* skip */ }
       });
     }).catch(function () {}).then(ping);
-    subscribe(RELAY + key + '-phone/sse', function (m) {
-      try { var e = JSON.parse(m.data); if (e.event === 'message') takeState(e.message); } catch (x) { /* skip */ }
+    // TV Home's state, and the Mac helper's answers to pings (they carry the TV's power)
+    subscribe(RELAY + key + '-phone,' + key + '-tv/sse', function (m) {
+      try {
+        var e = JSON.parse(m.data);
+        if (e.event !== 'message') return;
+        if (/-phone$/.test(e.topic)) return takeState(e.message);
+        var a = JSON.parse(e.message);
+        if (a && a.kind === 'ack') takeAck(a);
+      } catch (x) { /* skip */ }
     });
   }
 
@@ -173,6 +184,10 @@
       main.textContent = t('tvOn');
       var what = state.front === 'home' ? t('homeScreen') : state.front === 'other' ? t('otherApp') : state.front;
       sub.textContent = t('showing', { what: what }) + (state.weather ? ' · ' + t('weather', { w: state.weather }) : '');
+    } else if (macOn() && tvPower === 'on') {
+      document.getElementById('status-dot').className = 'dot on';
+      main.textContent = t('tvOn');
+      sub.textContent = t('homeClosed');
     } else {
       main.textContent = t('tvOff');
       sub.textContent = state ? t('lastSeen', { when: ago(state.at) }) : t('neverSeen');
@@ -214,6 +229,7 @@
     renderWalls();
     renderPlay();
     setStatus(statusMode);
+    renderPower();
     askWho();
   }
 
@@ -232,9 +248,28 @@
     });
   }
 
-  // the Mac helper answered TV Home's last ping (it presses the TV's real keys)
+  // the Mac helper presses the TV's real keys; its answers to pings say it's there, and the TV's power
+  var macAt = 0, tvPower = null;
+  function takeAck(a) {
+    macAt = Date.now();
+    tvPower = a.tv || null;
+    renderAll();
+  }
+
   function macOn() {
-    return !!(state && state.helperAt && state.at - state.helperAt < 15000);
+    return Date.now() - macAt < 60000 || !!(state && state.helperAt && state.at - state.helperAt < 15000);
+  }
+
+  function tvIsOn() {
+    return statusMode === 'on' || (macOn() && tvPower === 'on');
+  }
+
+  function renderPower() {
+    var b = document.getElementById('power');
+    var on = tvIsOn();
+    b.classList.toggle('on', on);
+    b.disabled = !macOn();
+    document.getElementById('power-label').textContent = t(on ? 'powerOff' : 'powerOn');
   }
 
   // ---------------------------------------------------------------- remote pad
@@ -497,6 +532,13 @@
   document.getElementById('home').addEventListener('click', function () { send({ cmd: 'home' }); });
   document.querySelectorAll('[data-key]').forEach(function (b) {
     b.addEventListener('click', function () { padPress(b.getAttribute('data-key')); });
+  });
+  document.getElementById('power').addEventListener('click', function () {
+    var on = !tvIsOn();
+    send({ cmd: 'power', on: on }).then(function () {
+      toast(t(on ? 'turningOn' : 'turningOff'));
+      setTimeout(ping, on ? 12000 : 5000); // then ask again how things are
+    }).catch(function () {});
   });
   document.getElementById('pad-play').addEventListener('click', function () {
     padPress(paused ? 'KEY_PLAY' : 'KEY_PAUSE');
