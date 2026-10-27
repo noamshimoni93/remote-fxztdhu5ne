@@ -22,11 +22,11 @@
       save: 'Save to the TV', wallpaper: 'Wallpaper', upload: 'Use one of my photos',
       uploadHint: 'Cropped to the TV’s shape and sent through the relay.', uploading: 'Sending the photo…',
       tooBig: 'That photo is too big to send', whoTitle: 'Who’s using this phone?',
-      volMac: 'Uses the TV’s own volume, through the Mac.',
+      volMac: 'Presses the TV’s own volume keys, through the Mac.',
       padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', samsungHome: 'Home', tabPad: 'Pad',
       padHint: 'Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.',
       padNoMac: 'The keys are pressed by the Mac. It’s asleep or off right now, so they won’t reach the TV.',
-      volNoMac: 'The Mac is asleep or off, so the volume only changes on the TV Home screen.',
+      volNoMac: 'The Mac is asleep or off, so volume and the pad won’t reach the TV right now.',
       whoHint: 'Your name goes with your messages. You can change it on the Message tab.', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
       tabWall: 'Wallpaper', sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay',
       saved: 'Saved', wallSet: 'Wallpaper changed', noKey: 'Open this page from your personal link to connect to the TV.',
@@ -46,11 +46,11 @@
       save: 'שמירה בטלוויזיה', wallpaper: 'רקע', upload: 'שימוש בתמונה שלי',
       uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'שולח את התמונה…',
       tooBig: 'התמונה גדולה מדי לשליחה', whoTitle: 'מי משתמש בטלפון הזה?',
-      volMac: 'משתמש בעוצמת הקול של הטלוויזיה עצמה, דרך המק.',
+      volMac: 'לוחץ על מקשי עוצמת הקול של הטלוויזיה עצמה, דרך המק.',
       padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', samsungHome: 'בית', tabPad: 'שלט',
       padHint: 'עובד בתוך נטפליקס, Apple TV ושאר האפליקציות, כמו השלט של הטלוויזיה. לחיצות מהירות נשלחות יחד, כך שלחיצה יכולה להתעכב רגע.',
       padNoMac: 'את המקשים לוחץ המק. כרגע הוא כבוי או במצב שינה, ולכן הם לא יגיעו לטלוויזיה.',
-      volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול משתנה רק במסך הבית.',
+      volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול והשלט לא יגיעו לטלוויזיה כרגע.',
       whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
       tabWall: 'רקע', sent: 'נשלח', opening: 'פותח את {app}', failed: 'אין חיבור לממסר',
       saved: 'נשמר', wallSet: 'הרקע הוחלף', noKey: 'יש לפתוח את הדף מהקישור האישי כדי להתחבר לטלוויזיה.',
@@ -259,15 +259,16 @@
   }
 
   // ---------------------------------------------------------------- volume
-  // The phone shows a change the moment you make it and sends one level per gesture: when you let go
-  // (or every 1.2 s while you keep holding). The free relay allows only about one request every 5 s
-  // per home, so it can't take a message per step. The TV's own reports are ignored for a moment after
-  // a local change, so the slider doesn't jump back while the TV catches up.
+  // Volume is the TV's own volume keys, pressed by the Mac helper: a change from 10 to 14 is four
+  // KEY_VOLUP presses, sent as one message when you let go (or every 1.2 s while you keep holding);
+  // the free relay allows only about one request every 5 s per home. The phone shows the change at
+  // once; the TV's reports are ignored for a moment so the slider doesn't jump back meanwhile.
   var vol = null, muted = false, localUntil = 0;
+  var volSent = null; // the volume the keys sent so far will leave the TV at
 
   function renderVolume() {
     if (state && typeof state.volume === 'number' && Date.now() > localUntil) {
-      vol = state.volume;
+      vol = volSent = state.volume;
       muted = !!state.muted;
     }
     var slider = document.getElementById('vol-slider');
@@ -291,14 +292,17 @@
 
   var VOL_SETTLE = 350;   // ms after the last change before sending
   var VOL_HOLD_EVERY = 1200;
-  var volTimer, volSentAt = 0, volSentLevel = null;
+  var volTimer, volSentAt = 0;
   function sendVolumeNow() {
     clearTimeout(volTimer);
-    if (vol === null || vol === volSentLevel) return;
+    if (vol === null || volSent === null || vol === volSent) return;
+    var diff = vol - volSent;
+    var keys = [];
+    for (var i = 0; i < Math.min(Math.abs(diff), 50); i++) keys.push(diff > 0 ? 'KEY_VOLUP' : 'KEY_VOLDOWN');
     volSentAt = Date.now();
-    volSentLevel = vol;
+    volSent = vol;
     localUntil = Date.now() + 4000;
-    send({ cmd: 'volume', level: vol }).catch(function () { volSentLevel = null; });
+    send({ cmd: 'keys', keys: keys }).catch(function () {});
   }
 
   function setVolume(level) {
@@ -503,10 +507,10 @@
   document.getElementById('vol-slider').addEventListener('input', function (e) { setVolume(Number(e.target.value)); });
   document.getElementById('mute').addEventListener('click', function () {
     if (vol === null) return;
-    muted = !muted;
-    localUntil = Date.now() + 2500;
+    muted = !muted; // the remote's Mute key toggles
+    localUntil = Date.now() + 4000;
     renderVolume();
-    send({ cmd: 'volume', mute: muted }).catch(function () {});
+    send({ cmd: 'keys', keys: ['KEY_MUTE'] }).catch(function () {});
   });
 
   function sendMessage() {
