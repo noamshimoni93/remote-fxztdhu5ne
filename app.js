@@ -23,7 +23,7 @@
       uploadHint: 'Cropped to the TV’s shape and sent through the relay.', uploading: 'Sending the photo…',
       tooBig: 'That photo is too big to send', whoTitle: 'Who’s using this phone?',
       volMac: 'Each tap is one press of the TV’s own volume key, through the Mac; hold to keep going. The TV shows the level on screen.',
-      padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', samsungHome: 'Home', tabPad: 'Pad',
+      padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', tabPad: 'Pad',
       padHint: 'Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.',
       padNoMac: 'The keys are pressed by the Mac. It’s asleep or off right now, so they won’t reach the TV.',
       powerOn: 'Turn the TV on', powerOff: 'Turn the TV off', turningOn: 'Turning the TV on…', stillOff: 'The TV hasn’t come on yet',
@@ -33,11 +33,10 @@
       tabWall: 'Wallpaper', sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay',
       saved: 'Saved', wallSet: 'Wallpaper changed', noKey: 'Open this page from your personal link to connect to the TV.',
       up: 'Move up', down: 'Move down', show: 'Show in the dock', weather: 'Tel Aviv: {w}',
-      coast: 'Tel Aviv coast', dusk: 'Dusk ridges', sea: 'Blue-hour sea', aurora: 'Aurora lake', custom: 'Your photo',
-      notAnswering: 'The TV didn’t answer'
+      coast: 'Tel Aviv coast', dusk: 'Dusk ridges', sea: 'Blue-hour sea', aurora: 'Aurora lake', custom: 'Your photo'
     },
     he: {
-      remote: 'שלט', connecting: 'מתחבר…', tvOn: 'הטלוויזיה דולקת', tvOff: 'הטלוויזיה כבויה או במצב שינה',
+      remote: 'שלט', connecting: 'התחברות…', tvOn: 'הטלוויזיה דולקת', tvOff: 'הטלוויזיה כבויה או במצב שינה',
       showing: 'מוצג: {what}', homeScreen: 'מסך הבית', otherApp: 'אפליקציה אחרת', lastSeen: 'נראתה לאחרונה {when}',
       neverSeen: 'עדיין אין תשובה', justNow: 'עכשיו', minutesAgo: 'לפני {n} דק׳', hoursAgo: 'לפני {n} שע׳',
       open: 'פתיחה בטלוויזיה', home: 'מסך הבית', volume: 'עוצמת קול', mute: 'השתקה',
@@ -46,21 +45,20 @@
       quick1: 'האוכל מוכן', quick2: 'בדרך הביתה', quick3: 'ערב סרט?', quick4: 'אוהב אותך',
       dock: 'סרגל האפליקציות', dockHint: 'שינוי הסדר בעזרת החצים; כיבוי אפליקציה מסתיר אותה.',
       save: 'שמירה בטלוויזיה', wallpaper: 'רקע', upload: 'שימוש בתמונה שלי',
-      uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'שולח את התמונה…',
+      uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'התמונה נשלחת…',
       tooBig: 'התמונה גדולה מדי לשליחה', whoTitle: 'מי משתמש בטלפון הזה?',
       volMac: 'כל הקשה היא לחיצה אחת על מקש עוצמת הקול של הטלוויזיה, דרך המק; לחיצה ממושכת ממשיכה. הרמה מוצגת על מסך הטלוויזיה.',
-      padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', samsungHome: 'בית', tabPad: 'שלט',
+      padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', tabPad: 'שלט',
       padHint: 'עובד בתוך נטפליקס, Apple TV ושאר האפליקציות, כמו השלט של הטלוויזיה. לחיצות מהירות נשלחות יחד, כך שלחיצה יכולה להתעכב רגע.',
       padNoMac: 'את המקשים לוחץ המק. כרגע הוא כבוי או במצב שינה, ולכן הם לא יגיעו לטלוויזיה.',
       powerOn: 'הדלקת הטלוויזיה', powerOff: 'כיבוי הטלוויזיה', turningOn: 'הטלוויזיה נדלקת…', stillOff: 'הטלוויזיה עדיין לא נדלקה',
       turningOff: 'הטלוויזיה נכבית…', homeClosed: 'מסך הבית לא פתוח', rewind: 'אחורה', forward: 'קדימה',
       volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול והשלט לא יגיעו לטלוויזיה כרגע.',
       whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
-      tabWall: 'רקע', sent: 'נשלח', opening: 'פותח את {app}', failed: 'אין חיבור לממסר',
+      tabWall: 'רקע', sent: 'נשלח', opening: 'פתיחת {app}…', failed: 'אין חיבור לממסר',
       saved: 'נשמר', wallSet: 'הרקע הוחלף', noKey: 'יש לפתוח את הדף מהקישור האישי כדי להתחבר לטלוויזיה.',
       up: 'הזזה למעלה', down: 'הזזה למטה', show: 'הצגה בסרגל', weather: 'תל אביב: {w}',
-      coast: 'חוף תל אביב', dusk: 'רכסים בשקיעה', sea: 'ים בשעה הכחולה', aurora: 'זוהר צפוני', custom: 'התמונה שלך',
-      notAnswering: 'הטלוויזיה לא ענתה'
+      coast: 'חוף תל אביב', dusk: 'רכסים בשקיעה', sea: 'ים בשעה הכחולה', aurora: 'זוהר צפוני', custom: 'התמונה שלך'
     }
   };
 
@@ -612,7 +610,12 @@
     if (e.target.files[0]) uploadPhoto(e.target.files[0]);
     e.target.value = '';
   });
-  document.addEventListener('visibilitychange', function () { if (!document.hidden && key) ping(); });
+  // back on screen: ask the TV again, but not on every quick app switch (each ask costs three relay
+  // messages: the ping, TV Home's state and the Mac's answer)
+  var PING_AGAIN = 60000;
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && key && Date.now() - pingAt > PING_AGAIN) ping();
+  });
 
   applyLanguage();
   if (!key) {
