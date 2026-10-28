@@ -117,7 +117,9 @@
     renderStatus();
     clearTimeout(pingTimer);
     pingTimer = setTimeout(function () {
-      if (!state || state.at < pingAt - 2000) { statusMode = 'off'; renderAll(); }
+      macMissed = relayOk && macAt < pingAt; // when the relay itself failed, the Mac never got the ping
+      statusMode = state && state.at >= pingAt - 2000 ? 'on' : 'off';
+      renderAll();
     }, PING_WAIT);
     send({ cmd: 'ping' }).catch(function () { statusMode = 'off'; renderStatus(); });
   }
@@ -216,8 +218,7 @@
       sub = t('checkNet');
     }
     $('status-sub').textContent = sub;
-    var knowsMac = macAt || (state && 'helperAt' in state);
-    $('status-mac').textContent = kind === 'noRelay' || !knowsMac ? '' : t(macOn() ? 'macOn' : 'macOff');
+    $('status-mac').textContent = kind === 'noRelay' ? '' : macMissed ? t('macOff') : macAt ? t('macOn') : '';
   }
 
   function ago(at) {
@@ -328,10 +329,13 @@
   }
 
   // ---------------------------------------------------------------- the Mac helper
-  // It presses the TV's real keys; its answers to pings say it's there, and the TV's power.
+  // It presses the TV's real keys; its answers to pings say it's there, and the TV's power. It counts
+  // as asleep only once it has missed a ping, not because a while has passed since the last one.
   var macAt = 0, tvPower = null;
+  var macMissed = false; // the helper didn't answer the latest ping
   function takeAck(a) {
     macAt = Date.now();
+    macMissed = false;
     tvPower = a.tv || null;
     relayOk = true;
     if (tvPower === 'on') turningOnUntil = 0;
@@ -339,7 +343,7 @@
   }
 
   function macOn() {
-    return Date.now() - macAt < 60000 || !!(state && state.helperAt && state.at - state.helperAt < 15000);
+    return !macMissed;
   }
 
   function tvIsOn() {
@@ -356,7 +360,7 @@
   }
 
   function renderMacNote() {
-    $('pad-note').hidden = !state || !('helperAt' in state) || macOn();
+    $('pad-note').hidden = macOn();
   }
 
   // ---------------------------------------------------------------- remote keys
