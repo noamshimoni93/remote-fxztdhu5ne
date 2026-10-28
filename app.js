@@ -6,75 +6,43 @@
   'use strict';
 
   var RELAY = 'https://ntfy.sh/';
-  var PING_WAIT = 7000; // ms to wait for the TV to answer before calling it off or asleep
+  var PING_WAIT = 7000;     // ms to wait for the TV to answer before calling it off or asleep
+  var TURN_ON_WAIT = 25000; // ms the status says "Turning on…" after the power tap, unless the TV answers
 
-  // ---------------------------------------------------------------- text (English default, he-IL translation)
-  var STRINGS = {
-    en: {
-      remote: 'Remote', connecting: 'Connecting…', tvOn: 'TV is on', tvOff: 'TV is off or asleep',
-      showing: 'Showing: {what}', homeScreen: 'TV Home', otherApp: 'another app', lastSeen: 'Last seen {when}',
-      neverSeen: 'Not heard from yet', justNow: 'just now', minutesAgo: '{n} min ago', hoursAgo: '{n} h ago',
-      open: 'Open on the TV', home: 'TV Home', volume: 'Volume', mute: 'Mute',
-      sendMessage: 'Send a message to the TV', from: 'From', message: 'Message', send: 'Send to the TV',
-      messageHint: 'It shows on the TV for 12 seconds, even over Netflix, then goes back.',
-      quick1: 'Dinner’s ready', quick2: 'On my way home', quick3: 'Movie night?', quick4: 'Love you',
-      dock: 'Dock', dockHint: 'Change the order with the arrows; switch an app off to hide it.',
-      save: 'Save to the TV', wallpaper: 'Wallpaper', upload: 'Use one of my photos',
-      uploadHint: 'Cropped to the TV’s shape and sent through the relay.', uploading: 'Sending the photo…',
-      tooBig: 'That photo is too big to send', whoTitle: 'Who’s using this phone?',
-      volMac: 'Each tap is one press of the TV’s own volume key, through the Mac; hold to keep going. The TV shows the level on screen.',
-      padTitle: 'Remote keys', ok: 'OK', back: 'Back', pause: 'Pause', play: 'Play', tabPad: 'Pad',
-      padHint: 'Works inside Netflix, Apple TV and the rest, like the TV remote. Quick taps are sent together, so a press can take a moment.',
-      padNoMac: 'The keys are pressed by the Mac. It’s asleep or off right now, so they won’t reach the TV.',
-      powerOn: 'Turn the TV on', powerOff: 'Turn the TV off', turningOn: 'Turning the TV on…', stillOff: 'The TV hasn’t come on yet',
-      turningOff: 'Turning the TV off…', homeClosed: 'TV Home isn’t open', rewind: 'Rewind', forward: 'Forward',
-      volNoMac: 'The Mac is asleep or off, so volume and the pad won’t reach the TV right now.',
-      whoHint: 'Your name goes with your messages. You can change it on the Message tab.', tabRemote: 'Remote', tabMessage: 'Message', tabDock: 'Dock',
-      tabWall: 'Wallpaper', sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay',
-      saved: 'Saved', wallSet: 'Wallpaper changed', noKey: 'Open this page from your personal link to connect to the TV.',
-      up: 'Move up', down: 'Move down', show: 'Show in the dock', weather: 'Tel Aviv: {w}',
-      coast: 'Tel Aviv coast', dusk: 'Dusk ridges', sea: 'Blue-hour sea', aurora: 'Aurora lake', custom: 'Your photo'
-    },
-    he: {
-      remote: 'שלט', connecting: 'התחברות…', tvOn: 'הטלוויזיה דולקת', tvOff: 'הטלוויזיה כבויה או במצב שינה',
-      showing: 'מוצג: {what}', homeScreen: 'מסך הבית', otherApp: 'אפליקציה אחרת', lastSeen: 'נראתה לאחרונה {when}',
-      neverSeen: 'עדיין אין תשובה', justNow: 'עכשיו', minutesAgo: 'לפני {n} דק׳', hoursAgo: 'לפני {n} שע׳',
-      open: 'פתיחה בטלוויזיה', home: 'מסך הבית', volume: 'עוצמת קול', mute: 'השתקה',
-      sendMessage: 'שליחת הודעה לטלוויזיה', from: 'מאת', message: 'הודעה', send: 'שליחה לטלוויזיה',
-      messageHint: 'ההודעה מוצגת בטלוויזיה 12 שניות, גם מעל נטפליקס, ואז חוזרים.',
-      quick1: 'האוכל מוכן', quick2: 'בדרך הביתה', quick3: 'ערב סרט?', quick4: 'אוהב אותך',
-      dock: 'סרגל האפליקציות', dockHint: 'שינוי הסדר בעזרת החצים; כיבוי אפליקציה מסתיר אותה.',
-      save: 'שמירה בטלוויזיה', wallpaper: 'רקע', upload: 'שימוש בתמונה שלי',
-      uploadHint: 'התמונה נחתכת לצורת המסך ונשלחת דרך הממסר.', uploading: 'התמונה נשלחת…',
-      tooBig: 'התמונה גדולה מדי לשליחה', whoTitle: 'מי משתמש בטלפון הזה?',
-      volMac: 'כל הקשה היא לחיצה אחת על מקש עוצמת הקול של הטלוויזיה, דרך המק; לחיצה ממושכת ממשיכה. הרמה מוצגת על מסך הטלוויזיה.',
-      padTitle: 'מקשי השלט', ok: 'אישור', back: 'חזרה', pause: 'השהיה', play: 'הפעלה', tabPad: 'שלט',
-      padHint: 'עובד בתוך נטפליקס, Apple TV ושאר האפליקציות, כמו השלט של הטלוויזיה. לחיצות מהירות נשלחות יחד, כך שלחיצה יכולה להתעכב רגע.',
-      padNoMac: 'את המקשים לוחץ המק. כרגע הוא כבוי או במצב שינה, ולכן הם לא יגיעו לטלוויזיה.',
-      powerOn: 'הדלקת הטלוויזיה', powerOff: 'כיבוי הטלוויזיה', turningOn: 'הטלוויזיה נדלקת…', stillOff: 'הטלוויזיה עדיין לא נדלקה',
-      turningOff: 'הטלוויזיה נכבית…', homeClosed: 'מסך הבית לא פתוח', rewind: 'אחורה', forward: 'קדימה',
-      volNoMac: 'המק כבוי או במצב שינה, ולכן עוצמת הקול והשלט לא יגיעו לטלוויזיה כרגע.',
-      whoHint: 'השם מצורף להודעות. אפשר לשנות אותו בלשונית ההודעות.', tabRemote: 'שלט', tabMessage: 'הודעה', tabDock: 'סרגל',
-      tabWall: 'רקע', sent: 'נשלח', opening: 'פתיחת {app}…', failed: 'אין חיבור לממסר',
-      saved: 'נשמר', wallSet: 'הרקע הוחלף', noKey: 'יש לפתוח את הדף מהקישור האישי כדי להתחבר לטלוויזיה.',
-      up: 'הזזה למעלה', down: 'הזזה למטה', show: 'הצגה בסרגל', weather: 'תל אביב: {w}',
-      coast: 'חוף תל אביב', dusk: 'רכסים בשקיעה', sea: 'ים בשעה הכחולה', aurora: 'זוהר צפוני', custom: 'התמונה שלך'
-    }
+  // ---------------------------------------------------------------- text
+  var TEXT = {
+    checking: 'Checking…', tvOn: 'TV is on', tvOnClosed: 'TV is on, TV Home closed', turningOn: 'Turning on…',
+    tvOff: 'TV is off or asleep', macAsleep: 'Mac is asleep', noRelay: 'Can’t reach the relay',
+    statusLabel: 'TV status: {what}. Tap for details.',
+    showing: 'Showing: {what}', homeScreen: 'TV Home', otherApp: 'another app', homeClosed: 'TV Home isn’t open',
+    lastSeen: 'Last seen {when}', neverSeen: 'Not heard from yet', justNow: 'just now', minutesAgo: '{n} min ago',
+    hoursAgo: '{n} h ago', weather: 'Tel Aviv {w}', checkNet: 'Sending failed: check the internet',
+    macOn: 'Mac connected: volume, keys and power work', macOff: 'Mac asleep or off: volume, keys and power won’t work',
+    appsHidden: '{n} apps · tap to show them', appsShown: 'Tap one to open it on the TV',
+    play: 'Play', pause: 'Pause', powerOn: 'Turn the TV on', powerOff: 'Turn the TV off',
+    turningOnToast: 'Turning the TV on…', turningOff: 'Turning the TV off…', stillOff: 'The TV hasn’t come on yet',
+    sent: 'Sent', opening: 'Opening {app}', failed: 'Couldn’t reach the relay', saved: 'Saved',
+    wallSet: 'Wallpaper changed', drawFirst: 'Draw something first',
+    quick1: 'Dinner’s ready', quick2: 'On my way home', quick3: 'Movie night?', quick4: 'Love you',
+    up: 'Move up', down: 'Move down', show: 'Show in the dock',
+    coast: 'Tel Aviv coast', dusk: 'Dusk ridges', sea: 'Blue-hour sea', aurora: 'Aurora lake', custom: 'Your photo',
+    uploading: 'Sending the photo…', uploadHint: 'Cropped to the TV’s shape and sent to the TV.',
+    tooBig: 'That photo is too big to send',
+    lookAuto: 'Follows the sun in Tel Aviv: light from {rise}, dark from {set}.',
+    lookAutoPlain: 'Follows the sun in Tel Aviv: light from sunrise, dark from sunset.',
+    lookLight: 'Stays light day and night, until you switch back to Auto.',
+    lookDark: 'Stays dark day and night, until you switch back to Auto.',
+    lookSet: 'TV Home switched to {look}', lookAutoSet: 'TV Home follows the sun again', light: 'light', dark: 'dark',
+    brush: 'Brush size: {size}', thin: 'thin', medium: 'medium', thick: 'thick',
+    white: 'White', teal: 'Teal', coral: 'Coral', yellow: 'Yellow', blue: 'Blue'
   };
 
-  var lang = 'en';
-  try { lang = localStorage.getItem('tvremote.lang') === 'he' ? 'he' : 'en'; } catch (e) { /* storage unavailable */ }
-
   function t(key, vars) {
-    return (STRINGS[lang][key] || STRINGS.en[key] || key).replace(/\{(\w+)\}/g, function (_, k) { return vars[k]; });
+    return (TEXT[key] || key).replace(/\{(\w+)\}/g, function (_, k) { return vars[k]; });
   }
 
-  function applyLanguage() {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
-    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t(el.getAttribute('data-t')); });
-    document.getElementById('lang').textContent = lang === 'he' ? 'EN' : 'עב';
-    renderAll();
+  function $(id) {
+    return document.getElementById(id);
   }
 
   // ---------------------------------------------------------------- key and storage
@@ -98,16 +66,35 @@
   var me = saved('me', null);       // who is holding this phone (a name from the TV)
   var pingAt = 0;
   var pingTimer;
+  var relayOk = true;               // false since the last send that couldn't reach the relay
 
   // `from`: the control(s) tapped; they light up with a tick once the relay has the command, or
   // shake when it couldn't be sent
   function send(command, from) {
     command.v = 1;
     if (me) command.from = me;
-    return fetch(RELAY + key + '-tv', { method: 'POST', body: JSON.stringify(command) }).then(function (r) {
+    return relayDone(fetch(RELAY + key + '-tv', { method: 'POST', body: JSON.stringify(command) }), from);
+  }
+
+  // A picture (a photo or a drawing) goes as an attachment; the command rides in the Message header,
+  // which must be plain ASCII, so other characters are written as JSON \u escapes.
+  function sendFile(blob, filename, command, from) {
+    command.v = 1;
+    if (me) command.from = me;
+    var header = JSON.stringify(command).replace(/[\u0080-￿]/g, function (c) {
+      return '\\u' + ('000' + c.charCodeAt(0).toString(16)).slice(-4);
+    });
+    return relayDone(fetch(RELAY + key + '-tv', { method: 'PUT', body: blob, headers: { 'Filename': filename, 'Message': header } }), from);
+  }
+
+  function relayDone(request, from) {
+    return request.then(function (r) {
       if (!r.ok) throw new Error(r.status);
+      if (!relayOk) { relayOk = true; renderStatus(); }
       mark(from, 'sent');
     }).catch(function () {
+      relayOk = false;
+      renderStatus();
       mark(from, 'unsent');
       toast(t('failed'));
       throw new Error('relay');
@@ -126,10 +113,13 @@
 
   function ping() {
     pingAt = Date.now();
-    setStatus('wait');
+    statusMode = 'wait';
+    renderStatus();
     clearTimeout(pingTimer);
-    pingTimer = setTimeout(function () { if (!state || state.at < pingAt - 2000) setStatus('off'); }, PING_WAIT);
-    send({ cmd: 'ping' }).catch(function () { setStatus('off'); });
+    pingTimer = setTimeout(function () {
+      if (!state || state.at < pingAt - 2000) { statusMode = 'off'; renderAll(); }
+    }, PING_WAIT);
+    send({ cmd: 'ping' }).catch(function () { statusMode = 'off'; renderStatus(); });
   }
 
   function takeState(message) {
@@ -139,8 +129,9 @@
     if (state && s.at < state.at) return;
     state = s;
     save('state', s);
+    statusMode = 'on';
+    turningOnUntil = 0;
     renderAll();
-    setStatus('on');
   }
 
   // A live relay subscription that backs off when refused: the browser's own retry every few seconds
@@ -180,30 +171,52 @@
     });
   }
 
-  // ---------------------------------------------------------------- status
-  var statusMode = 'wait';
-  function setStatus(mode) {
-    statusMode = mode;
-    var fresh = state && state.at >= pingAt - 2000;
-    if (mode === 'on' && !fresh) mode = statusMode = 'off';
-    document.getElementById('status-dot').className = 'dot ' + (mode === 'on' ? 'on' : mode === 'wait' ? 'wait' : '');
-    var main = document.getElementById('status-main');
-    var sub = document.getElementById('status-sub');
-    if (mode === 'wait') {
-      main.textContent = t('connecting');
-      sub.textContent = '';
-    } else if (mode === 'on') {
-      main.textContent = t('tvOn');
+  // ---------------------------------------------------------------- status icon
+  // One answer to "how is the TV?", for both the icon's dot and the details behind it.
+  var statusMode = 'wait'; // 'wait' while a ping is out, then 'on' (TV Home answered) or 'off'
+  var turningOnUntil = 0;
+
+  function statusKind() {
+    if (!relayOk) return 'noRelay';
+    var homeAnswered = statusMode === 'on' && state && state.at >= pingAt - 2000;
+    if (homeAnswered) return macOn() ? 'on' : 'macAsleep';
+    if (Date.now() < turningOnUntil) return 'turningOn';
+    if (statusMode === 'wait') return 'checking';
+    if (macOn() && tvPower === 'on') return 'onClosed';
+    return 'off';
+  }
+
+  // kind -> [dot style, text, how faint the TV glyph is]
+  var STATUS = {
+    checking: ['wait', 'checking', ''], on: ['on', 'tvOn', ''], onClosed: ['on', 'tvOnClosed', 'faint'],
+    turningOn: ['wait', 'turningOn', 'faint'], off: ['', 'tvOff', 'fainter'], macAsleep: ['mac', 'macAsleep', ''],
+    noRelay: ['err', 'noRelay', '']
+  };
+
+  function renderStatus() {
+    var kind = statusKind();
+    var s = STATUS[kind];
+    $('status-dot').className = 'dot ' + s[0];
+    $('card-dot').className = 'dot ' + s[0];
+    var btn = $('status-btn');
+    btn.classList.toggle('faint', s[2] === 'faint');
+    btn.classList.toggle('fainter', s[2] === 'fainter');
+    btn.setAttribute('aria-label', t('statusLabel', { what: t(s[1]) }));
+    $('status-main').textContent = t(s[1]);
+    var sub = '';
+    if (kind === 'on' || kind === 'macAsleep') {
       var what = state.front === 'home' ? t('homeScreen') : state.front === 'other' ? t('otherApp') : state.front;
-      sub.textContent = t('showing', { what: what }) + (state.weather ? ' · ' + t('weather', { w: state.weather }) : '');
-    } else if (macOn() && tvPower === 'on') {
-      document.getElementById('status-dot').className = 'dot on';
-      main.textContent = t('tvOn');
-      sub.textContent = t('homeClosed');
-    } else {
-      main.textContent = t('tvOff');
-      sub.textContent = state ? t('lastSeen', { when: ago(state.at) }) : t('neverSeen');
+      sub = t('showing', { what: what }) + (state.weather ? ' · ' + t('weather', { w: state.weather }) : '');
+    } else if (kind === 'onClosed') {
+      sub = t('homeClosed');
+    } else if (kind === 'off') {
+      sub = state ? t('lastSeen', { when: ago(state.at) }) : t('neverSeen');
+    } else if (kind === 'noRelay') {
+      sub = t('checkNet');
     }
+    $('status-sub').textContent = sub;
+    var knowsMac = macAt || (state && 'helperAt' in state);
+    $('status-mac').textContent = kind === 'noRelay' || !knowsMac ? '' : t(macOn() ? 'macOn' : 'macOff');
   }
 
   function ago(at) {
@@ -213,10 +226,14 @@
     return t('hoursAgo', { n: Math.round(min / 60) });
   }
 
+  function showCard(open) {
+    $('status-card').hidden = !open;
+    $('status-btn').setAttribute('aria-expanded', String(open));
+  }
+
   // ---------------------------------------------------------------- rendering
   function names() {
-    // "Noam & Amir", or the Hebrew "נועם ואמיר" (the "and" is a ו prefix)
-    return state && state.names ? state.names.split(/\s+&\s+|\s+ו(?=\S)/).filter(Boolean) : [];
+    return state && state.names ? state.names.split(/\s+&\s+/).filter(Boolean) : [];
   }
 
   function isLight(rgb) {
@@ -232,15 +249,15 @@
   }
 
   function renderAll() {
-    document.getElementById('brand').textContent = state && state.names ? state.names : 'TV';
+    $('brand').textContent = state && state.names ? state.names : 'TV';
     renderApps();
-    renderVolume();
+    renderMacNote();
     renderWho();
-    renderQuick();
     renderDock();
     renderWalls();
+    renderLook();
     renderPlay();
-    setStatus(statusMode);
+    renderStatus();
     renderPower();
     askWho();
   }
@@ -266,26 +283,56 @@
     return tile;
   }
 
+  // ---------------------------------------------------------------- apps (behind one button)
+  // The grid is rebuilt only when the apps themselves change, so a state arriving mid-animation
+  // doesn't cut the opening short.
+  var appsOpen = false;
+  var appsShape = '';
+  var APPS_CLOSE_AFTER = 1100; // ms after an app tap was sent: time to see the tick
+
   function renderApps() {
-    var box = document.getElementById('apps');
+    var apps = (state && state.apps) || [];
+    $('apps-hint').textContent = appsOpen ? t('appsShown') : t('appsHidden', { n: apps.length });
+    var shape = apps.map(function (a) { return a.label + (a.hidden ? '-' : '') + a.rgb; }).join('|');
+    if (shape === appsShape) return;
+    appsShape = shape;
+    var mini = $('apps-mini');
+    mini.innerHTML = '';
+    apps.filter(function (a) { return !a.hidden; }).slice(0, 4).forEach(function (app) { mini.appendChild(appIcon(app, 'tile')); });
+    var box = $('apps');
     box.innerHTML = '';
-    ((state && state.apps) || []).forEach(function (app) {
+    apps.forEach(function (app, i) {
+      var cell = el('div', { 'class': 'app-cell' });
+      cell.style.setProperty('--i', i);
       var b = el('button', { type: 'button', 'class': 'app-btn' + (app.hidden ? ' off' : '') });
       var tile = appIcon(app, 'tile');
       b.appendChild(tile);
-      b.appendChild(el('span', { 'class': 'name', dir: 'auto' }, app.label)); // "Disney+" stays "Disney+" in Hebrew
+      b.appendChild(el('span', { 'class': 'name' }, app.label));
       b.addEventListener('click', function () {
-        send({ cmd: 'open', app: app.label }, tile).then(function () { toast(t('opening', { app: app.label })); });
+        send({ cmd: 'open', app: app.label }, tile).then(function () {
+          toast(t('opening', { app: app.label }));
+          setTimeout(function () { setAppsOpen(false); }, APPS_CLOSE_AFTER);
+        }).catch(function () {});
       });
-      box.appendChild(b);
+      cell.appendChild(b);
+      box.appendChild(cell);
     });
   }
 
-  // the Mac helper presses the TV's real keys; its answers to pings say it's there, and the TV's power
+  function setAppsOpen(open) {
+    appsOpen = open;
+    $('apps-toggle').setAttribute('aria-expanded', String(open));
+    $('apps-box').classList.toggle('open', open);
+    renderApps();
+  }
+
+  // ---------------------------------------------------------------- the Mac helper
+  // It presses the TV's real keys; its answers to pings say it's there, and the TV's power.
   var macAt = 0, tvPower = null;
   function takeAck(a) {
     macAt = Date.now();
     tvPower = a.tv || null;
+    if (tvPower === 'on') turningOnUntil = 0;
     renderAll();
   }
 
@@ -294,24 +341,29 @@
   }
 
   function tvIsOn() {
-    return statusMode === 'on' || (macOn() && tvPower === 'on');
+    var kind = statusKind();
+    return kind === 'on' || kind === 'onClosed' || kind === 'macAsleep';
   }
 
   function renderPower() {
-    var b = document.getElementById('power');
+    var b = $('power');
     var on = tvIsOn();
     b.classList.toggle('on', on);
     b.disabled = !macOn();
-    document.getElementById('power-label').textContent = t(on ? 'powerOff' : 'powerOn');
+    b.setAttribute('aria-label', t(on ? 'powerOff' : 'powerOn'));
   }
 
-  // ---------------------------------------------------------------- remote pad
+  function renderMacNote() {
+    $('pad-note').hidden = !state || !('helperAt' in state) || macOn();
+  }
+
+  // ---------------------------------------------------------------- remote keys
   // Keys go to the Mac helper, which presses them on the TV. Taps within a short moment travel as one
   // message: the free relay allows only about one request every 5 s per home after a short burst.
   var PAD_GATHER = 250; // ms
   var padKeys = [], padButtons = [], padTimer;
-  function padPress(key, button) {
-    padKeys.push(key);
+  function padPress(k, button) {
+    padKeys.push(k);
     if (padButtons.indexOf(button) < 0) padButtons.push(button);
     if (navigator.vibrate) navigator.vibrate(10);
     if (!padTimer) padTimer = setTimeout(function () {
@@ -325,35 +377,24 @@
 
   var paused = false; // the TV doesn't say whether something plays, so the button alternates
   function renderPlay() {
-    var b = document.getElementById('pad-play');
-    b.classList.toggle('paused', paused);
-    document.getElementById('pad-play-label').textContent = t(paused ? 'play' : 'pause');
+    $('pad-play').classList.toggle('paused', paused);
+    $('pad-play-label').textContent = t(paused ? 'play' : 'pause');
   }
 
   // ---------------------------------------------------------------- volume
   // Volume is the TV's own volume keys, pressed by the Mac helper. The level itself can't be read (the
-  // sound doesn't go through the TV's own volume), so the phone shows only the steps it sends: taps
-  // within a moment travel as one message (or every 1.2 s while you keep holding), since the free
-  // relay allows only about one request every 5 s per home.
+  // sound doesn't go through the TV's own volume), so the phone shows only the steps it sends, in
+  // place of Mute: taps within a moment travel as one message (or every 1.2 s while you keep holding),
+  // since the free relay allows only about one request every 5 s per home.
   var volPending = 0;   // steps not sent yet
   var volBurst = 0;     // steps of the current run of taps, shown as "+3"
   var VOL_SETTLE = 350; // ms after the last tap before sending
   var VOL_HOLD_EVERY = 1200;
   var volTimer, volSentAt = 0, burstTimer, volButtons = [];
 
-  function renderVolume() {
-    var hint = document.getElementById('vol-hint');
-    hint.hidden = !state || !('helperAt' in state);
-    if (!hint.hidden) hint.textContent = t(macOn() ? 'volMac' : 'volNoMac');
-    var padNote = document.getElementById('pad-note');
-    padNote.hidden = !state || !('helperAt' in state) || macOn();
-    padNote.textContent = t('padNoMac');
-  }
-
   function showBurst() {
-    var box = document.getElementById('vol-burst');
-    box.textContent = volBurst > 0 ? '+' + volBurst : volBurst < 0 ? '\u2212' + -volBurst : '';
-    box.classList.add('on');
+    $('vol-burst').textContent = volBurst > 0 ? '+' + volBurst : volBurst < 0 ? '−' + -volBurst : '';
+    $('mute').classList.toggle('burst', volBurst !== 0);
   }
 
   function sendVolumeNow() {
@@ -379,8 +420,8 @@
     clearTimeout(burstTimer);
     burstTimer = setTimeout(function () { // a new run of taps starts counting from zero
       volBurst = 0;
-      document.getElementById('vol-burst').classList.remove('on');
-    }, 2200);
+      showBurst();
+    }, 2000);
   }
 
   // hold − or + to keep stepping, faster after a moment
@@ -404,11 +445,12 @@
     button.addEventListener('click', function (e) { if (e.detail === 0) volStep(step, button); }); // keyboard
   }
 
+  // ---------------------------------------------------------------- who's using this phone
   function askWho() {
     var list = names();
-    var sheet = document.getElementById('sheet');
+    var sheet = $('sheet');
     if (me || !list.length) { sheet.hidden = true; return; }
-    var box = document.getElementById('sheet-names');
+    var box = $('sheet-names');
     box.innerHTML = '';
     list.forEach(function (name) {
       var b = el('button', { type: 'button' }, name);
@@ -419,7 +461,7 @@
   }
 
   function renderWho() {
-    var box = document.getElementById('who');
+    var box = $('who');
     box.innerHTML = '';
     names().forEach(function (name) {
       var c = el('button', { type: 'button', 'class': 'chip' + (me === name ? ' on' : ''), 'aria-pressed': String(me === name) }, name);
@@ -429,26 +471,170 @@
   }
 
   function renderQuick() {
-    var box = document.getElementById('quick');
-    box.innerHTML = '';
+    var box = $('quick');
     ['quick1', 'quick2', 'quick3', 'quick4'].forEach(function (k) {
       var c = el('button', { type: 'button', 'class': 'chip' }, t(k));
-      c.addEventListener('click', function () { var box = document.getElementById('msg'); box.value = t(k); box.focus(); });
+      c.addEventListener('click', function () { var msg = $('msg'); msg.value = t(k); msg.focus(); });
       box.appendChild(c);
     });
   }
 
+  // ---------------------------------------------------------------- message: text or drawing
+  var messageMode = saved('mode', 'text') === 'draw' ? 'draw' : 'text';
+
+  function setMessageMode(mode) {
+    messageMode = mode;
+    save('mode', mode);
+    $('mode-text').setAttribute('aria-pressed', String(mode === 'text'));
+    $('mode-draw').setAttribute('aria-pressed', String(mode === 'draw'));
+    $('text-mode').hidden = mode !== 'text';
+    $('draw-mode').hidden = mode !== 'draw';
+    if (mode === 'draw') fitBoard();
+  }
+
+  function sendMessage() {
+    var box = $('msg');
+    var text = box.value.trim();
+    if (!text) return box.focus();
+    send({ cmd: 'message', text: text }, $('send')).then(function () { box.value = ''; toast(t('sent')); }).catch(function () {});
+  }
+
+  // A drawing is kept as strokes in board coordinates (0..1 across, 0..9/16 down), so it redraws
+  // sharply at any size: on screen, after Undo, and at 960x540 for the TV.
+  var COLOURS = [['white', '#ffffff'], ['teal', '#5fd4c4'], ['coral', '#ff8a7a'], ['yellow', '#ffd166'], ['blue', '#7aa7ff']];
+  var BRUSHES = [['thin', 5 / 320], ['medium', 9 / 320], ['thick', 14 / 320]]; // line width, share of the board's width
+  var BOARD_INK = '#0e2b39'; // the board's colour, sent along so the TV shows it the same
+  var strokes = [];
+  var colour = saved('colour', 'coral');
+  var brush = saved('brush', 1);
+  var drawing = null; // the stroke under the finger
+
+  function paint(ctx, width) {
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    strokes.forEach(function (s) {
+      var pts = s.points;
+      ctx.strokeStyle = ctx.fillStyle = s.colour;
+      ctx.lineWidth = s.size * width;
+      if (pts.length === 1) { // a tap: a dot
+        ctx.beginPath();
+        ctx.arc(pts[0][0] * width, pts[0][1] * width, s.size * width / 2, 0, Math.PI * 2);
+        ctx.fill();
+        return;
+      }
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0] * width, pts[0][1] * width);
+      for (var i = 1; i < pts.length - 1; i++) { // smooth through the midpoints
+        ctx.quadraticCurveTo(pts[i][0] * width, pts[i][1] * width,
+          (pts[i][0] + pts[i + 1][0]) / 2 * width, (pts[i][1] + pts[i + 1][1]) / 2 * width);
+      }
+      var last = pts[pts.length - 1];
+      ctx.lineTo(last[0] * width, last[1] * width);
+      ctx.stroke();
+    });
+  }
+
+  var boardWidth = 0;
+  function fitBoard() {
+    var canvas = $('board-canvas');
+    var w = $('board').clientWidth;
+    if (!w) return;
+    var ratio = window.devicePixelRatio || 1;
+    boardWidth = w;
+    canvas.width = Math.round(w * ratio);
+    canvas.height = Math.round(w * 9 / 16 * ratio);
+    redraw();
+  }
+
+  var redrawQueued = false;
+  function redraw() {
+    redrawQueued = false;
+    var canvas = $('board-canvas');
+    var ctx = canvas.getContext('2d');
+    var ratio = canvas.width / (boardWidth || 1);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, boardWidth, boardWidth * 9 / 16);
+    paint(ctx, boardWidth);
+    $('board').classList.toggle('inked', strokes.length > 0);
+    $('undo').disabled = $('clear').disabled = !strokes.length;
+  }
+
+  function redrawSoon() {
+    if (!redrawQueued) { redrawQueued = true; requestAnimationFrame(redraw); }
+  }
+
+  function boardPoint(e) {
+    var r = $('board-canvas').getBoundingClientRect();
+    return [Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1), Math.min(Math.max((e.clientY - r.top) / r.width, 0), 9 / 16)];
+  }
+
+  function wireBoard() {
+    var canvas = $('board-canvas');
+    canvas.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      try { canvas.setPointerCapture(e.pointerId); } catch (x) { /* the pointer is already gone */ }
+      drawing = { colour: COLOURS.filter(function (c) { return c[0] === colour; })[0][1], size: BRUSHES[brush][1], points: [boardPoint(e)], id: e.pointerId };
+      strokes.push(drawing);
+      redrawSoon();
+    });
+    canvas.addEventListener('pointermove', function (e) {
+      if (!drawing || e.pointerId !== drawing.id) return;
+      var events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      (events.length ? events : [e]).forEach(function (ev) { drawing.points.push(boardPoint(ev)); });
+      redrawSoon();
+    });
+    ['pointerup', 'pointercancel'].forEach(function (ev) {
+      canvas.addEventListener(ev, function () { drawing = null; });
+    });
+    window.addEventListener('resize', function () { if (messageMode === 'draw') fitBoard(); });
+  }
+
+  function renderDrawTools() {
+    var box = $('swatches');
+    box.innerHTML = '';
+    COLOURS.forEach(function (c) {
+      var b = el('button', { type: 'button', 'class': 'swatch-btn', 'aria-label': t(c[0]), 'aria-pressed': String(c[0] === colour) });
+      b.style.setProperty('--c', c[1]);
+      b.addEventListener('click', function () { colour = c[0]; save('colour', colour); renderDrawTools(); });
+      box.appendChild(b);
+    });
+    var dot = $('brush-dot');
+    dot.style.width = dot.style.height = [6, 10, 16][brush] + 'px';
+    $('brush').setAttribute('aria-label', t('brush', { size: t(BRUSHES[brush][0]) }));
+  }
+
+  function sendDrawing() {
+    var b = $('send-drawing');
+    if (!strokes.length) { toast(t('drawFirst')); return; }
+    var out = el('canvas');
+    out.width = 960;
+    out.height = 540;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = BOARD_INK;
+    ctx.fillRect(0, 0, 960, 540);
+    paint(ctx, 960);
+    b.disabled = true;
+    out.toBlob(function (blob) {
+      sendFile(blob, 'drawing.png', { cmd: 'draw' }, b).then(function () {
+        toast(t('sent'));
+        strokes = [];
+        redraw();
+      }).catch(function () {}).then(function () { b.disabled = false; });
+    }, 'image/png');
+  }
+
+  // ---------------------------------------------------------------- dock
   // the dock editor works on a draft until Save
   var draft = null;
   function renderDock() {
     if (!state || !state.apps) return;
     if (!draft) draft = state.apps.map(function (a) { return { label: a.label, rgb: a.rgb, hidden: a.hidden }; });
-    var list = document.getElementById('dock-list');
+    var list = $('dock-list');
     list.innerHTML = '';
     draft.forEach(function (app, i) {
       var row = el('li', { 'class': 'dock-row' + (app.hidden ? ' off' : '') });
       row.appendChild(appIcon(app, 'swatch'));
-      row.appendChild(el('span', { 'class': 'dname', dir: 'auto' }, app.label));
+      row.appendChild(el('span', { 'class': 'dname' }, app.label));
       [['up', -1, 'M6 15l6-6 6 6'], ['down', 1, 'M6 9l6 6 6-6']].forEach(function (m) {
         var b = el('button', { type: 'button', 'class': 'move', 'aria-label': t(m[0]) + ': ' + app.label });
         b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + m[2] + '"/></svg>';
@@ -468,34 +654,48 @@
     });
   }
 
-  var WALL_LOOKS = {
-    coast: 'linear-gradient(160deg, #6f9ccc 0%, #c9d6e6 40%, #2f7d84 62%, #0d4a55 100%)',
-    dusk: 'linear-gradient(180deg, #1b1c42 0%, #93648a 50%, #2a2550 70%, #0b0a1a 100%)',
-    sea: 'linear-gradient(180deg, #040817 0%, #2c4c85 50%, #263c68 60%, #050a19 100%)',
-    aurora: 'linear-gradient(180deg, #01040c 0%, #1f7f6a 35%, #041226 60%, #050b11 100%)',
-    custom: 'linear-gradient(135deg, #2b3a47, #51606e)'
-  };
-
+  // ---------------------------------------------------------------- wallpaper and look
   function renderWalls() {
-    var box = document.getElementById('walls');
+    var box = $('walls');
     box.innerHTML = '';
     var list = ((state && state.walls) || ['coast', 'dusk', 'sea', 'aurora']).slice();
     if (state && state.wallpaper === 'custom') list.push('custom');
     list.forEach(function (name) {
       var current = state && state.wallpaper === name;
-      var b = el('button', { type: 'button', 'class': 'wall' + (current ? ' on' : ''), 'aria-pressed': String(current) });
-      b.style.background = WALL_LOOKS[name] || WALL_LOOKS.custom;
+      var b = el('button', { type: 'button', 'class': 'wall' + (current ? ' on' : '') + (name === 'custom' ? ' custom' : ''), 'aria-pressed': String(current) });
+      if (name !== 'custom') b.style.backgroundImage = 'url(walls/' + name + '.jpg)';
       b.appendChild(el('span', {}, t(name)));
       if (name !== 'custom') {
-        b.addEventListener('click', function () { send({ cmd: 'wallpaper', name: name }, b).then(function () { toast(t('wallSet')); }); });
+        b.addEventListener('click', function () { send({ cmd: 'wallpaper', name: name }, b).then(function () { toast(t('wallSet')); }).catch(function () {}); });
       }
       box.appendChild(b);
     });
   }
 
+  // The pressed button follows what TV Home says, like the wallpaper.
+  function renderLook() {
+    var mode = state && state.look;
+    document.querySelectorAll('[data-look]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-look') === mode));
+    });
+    var note;
+    if (mode === 'light') note = t('lookLight');
+    else if (mode === 'dark') note = t('lookDark');
+    else if (state && state.sun) note = t('lookAuto', { rise: state.sun.rise, set: state.sun.set });
+    else note = t('lookAutoPlain');
+    $('look-note').textContent = note;
+  }
+
+  function pickLook(mode, button) {
+    send({ cmd: 'look', mode: mode }, button).then(function () {
+      if (state) { state.look = mode; renderLook(); } // until TV Home's own answer
+      toast(mode === 'auto' ? t('lookAutoSet') : t('lookSet', { look: t(mode) }));
+    }).catch(function () {});
+  }
+
   var toastTimer;
   function toast(text) {
-    var box = document.getElementById('toast');
+    var box = $('toast');
     box.textContent = text;
     box.classList.add('show');
     clearTimeout(toastTimer);
@@ -505,7 +705,7 @@
   // ---------------------------------------------------------------- photo upload
   // Cropped to 1920x1080 and squeezed under the relay's 2 MB limit, then sent as an attachment.
   function uploadPhoto(file) {
-    var note = document.getElementById('upload-note');
+    var note = $('upload-note');
     note.textContent = t('uploading');
     var img = new Image();
     img.onload = function () {
@@ -520,22 +720,32 @@
         canvas.toBlob(function (blob) {
           if (blob.size > 1900000 && quality > 0.5) return encode(quality - 0.1);
           if (blob.size > 1900000) { note.textContent = t('tooBig'); return; }
-          fetch(RELAY + key + '-tv', {
-            method: 'PUT',
-            body: blob,
-            headers: { 'Filename': 'wallpaper.jpg', 'Message': JSON.stringify({ v: 1, cmd: 'wallpaper', custom: true }) }
-          }).then(function (r) {
-            if (!r.ok) throw new Error(r.status);
+          sendFile(blob, 'wallpaper.jpg', { cmd: 'wallpaper', custom: true }).then(function () {
             note.textContent = t('uploadHint');
             toast(t('wallSet'));
-          }).catch(function () {
-            note.textContent = t('failed');
-          });
+          }).catch(function () { note.textContent = t('failed'); });
         }, 'image/jpeg', quality);
       })(0.86);
     };
     img.src = URL.createObjectURL(file);
   }
+
+  // ---------------------------------------------------------------- press and release
+  // Every button shrinks while touched and springs back when let go (style.css: .pressed). Driven by
+  // pointer events, since iPhone Safari shows :active on a touch only in some cases.
+  var PRESSABLE = 'button, .upload';
+  document.addEventListener('pointerdown', function (e) {
+    var b = e.target.closest ? e.target.closest(PRESSABLE) : null;
+    if (!b || b.disabled) return;
+    b.classList.add('pressed');
+    function release() {
+      b.classList.remove('pressed');
+      document.removeEventListener('pointerup', release, true);
+      document.removeEventListener('pointercancel', release, true);
+    }
+    document.addEventListener('pointerup', release, true);
+    document.addEventListener('pointercancel', release, true);
+  }, true);
 
   // ---------------------------------------------------------------- wiring
   function showPanel(name) {
@@ -543,70 +753,77 @@
     document.querySelectorAll('.tab').forEach(function (b) {
       var on = b.getAttribute('data-panel') === name;
       b.classList.toggle('on', on);
-      b.setAttribute('aria-current', on ? 'page' : 'false');
+      if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     if (name === 'dock') { draft = null; renderDock(); }
+    if (name === 'message' && messageMode === 'draw') fitBoard();
   }
 
   document.querySelectorAll('.tab').forEach(function (b) {
     b.addEventListener('click', function () { showPanel(b.getAttribute('data-panel')); });
   });
-  document.getElementById('lang').addEventListener('click', function () {
-    lang = lang === 'he' ? 'en' : 'he';
-    try { localStorage.setItem('tvremote.lang', lang); } catch (e) { /* storage unavailable */ }
-    applyLanguage();
+
+  $('status-btn').addEventListener('click', function () { showCard($('status-card').hidden); });
+  document.addEventListener('click', function (e) { // a tap anywhere else closes the details
+    if (!$('status-card').hidden && !e.target.closest('#status-card, #status-btn')) showCard(false);
   });
-  document.getElementById('refresh').addEventListener('click', function () { mark(this, 'spin'); ping(); });
-  ['home', 'pad-home'].forEach(function (id) {
-    document.getElementById(id).addEventListener('click', function () {
-      if (navigator.vibrate) navigator.vibrate(10);
-      send({ cmd: 'home' }, this).catch(function () {});
-    });
+  $('refresh').addEventListener('click', function () { mark(this, 'spin'); ping(); });
+
+  $('apps-toggle').addEventListener('click', function () { setAppsOpen(!appsOpen); });
+  $('pad-home').addEventListener('click', function () {
+    if (navigator.vibrate) navigator.vibrate(10);
+    send({ cmd: 'home' }, this).catch(function () {});
   });
   document.querySelectorAll('[data-key]').forEach(function (b) {
     b.addEventListener('click', function () { padPress(b.getAttribute('data-key'), b); });
   });
-  document.getElementById('power').addEventListener('click', function () {
+  $('power').addEventListener('click', function () {
     var on = !tvIsOn();
     send({ cmd: 'power', on: on }, this).then(function () {
-      toast(t(on ? 'turningOn' : 'turningOff'));
+      toast(t(on ? 'turningOnToast' : 'turningOff'));
+      if (on) { turningOnUntil = Date.now() + TURN_ON_WAIT; renderAll(); }
       // then ask how things are; from deep sleep the TV can take a few seconds more
       setTimeout(ping, on ? 8000 : 5000);
       if (on) setTimeout(function () { if (!tvIsOn()) { toast(t('stillOff')); ping(); } }, 20000);
     }).catch(function () {});
   });
-  document.getElementById('pad-play').addEventListener('click', function () {
+  $('pad-play').addEventListener('click', function () {
     padPress(paused ? 'KEY_PLAY' : 'KEY_PAUSE', this);
     paused = !paused;
     renderPlay();
   });
 
-  holdStep(document.getElementById('vol-up'), 1);
-  holdStep(document.getElementById('vol-down'), -1);
-  document.getElementById('mute').addEventListener('click', function () {
+  holdStep($('vol-up'), 1);
+  holdStep($('vol-down'), -1);
+  $('mute').addEventListener('click', function () {
     if (navigator.vibrate) navigator.vibrate(10);
     send({ cmd: 'keys', keys: ['KEY_MUTE'] }, this).catch(function () {}); // the remote's Mute key toggles
   });
 
-  function sendMessage() {
-    var box = document.getElementById('msg');
-    var text = box.value.trim();
-    if (!text) return box.focus();
-    send({ cmd: 'message', text: text }, document.getElementById('send')).then(function () { box.value = ''; toast(t('sent')); });
-  }
-  document.getElementById('send').addEventListener('click', sendMessage);
-  document.getElementById('msg').addEventListener('keydown', function (e) {
+  $('mode-text').addEventListener('click', function () { setMessageMode('text'); });
+  $('mode-draw').addEventListener('click', function () { setMessageMode('draw'); });
+  $('send').addEventListener('click', sendMessage);
+  $('msg').addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(); }
   });
-  document.getElementById('dock-save').addEventListener('click', function () {
+  $('brush').addEventListener('click', function () { brush = (brush + 1) % BRUSHES.length; save('brush', brush); renderDrawTools(); });
+  $('undo').addEventListener('click', function () { strokes.pop(); redraw(); });
+  $('clear').addEventListener('click', function () { strokes = []; redraw(); });
+  $('send-drawing').addEventListener('click', sendDrawing);
+  wireBoard();
+
+  $('dock-save').addEventListener('click', function () {
     if (!draft) return;
     send({
       cmd: 'dock',
       order: draft.map(function (a) { return a.label; }),
       hidden: draft.filter(function (a) { return a.hidden; }).map(function (a) { return a.label; })
-    }, document.getElementById('dock-save')).then(function () { toast(t('saved')); });
+    }, $('dock-save')).then(function () { toast(t('saved')); }).catch(function () {});
   });
-  document.getElementById('upload').addEventListener('change', function (e) {
+  document.querySelectorAll('[data-look]').forEach(function (b) {
+    b.addEventListener('click', function () { pickLook(b.getAttribute('data-look'), b); });
+  });
+  $('upload').addEventListener('change', function (e) {
     if (e.target.files[0]) uploadPhoto(e.target.files[0]);
     e.target.value = '';
   });
@@ -617,9 +834,12 @@
     if (!document.hidden && key && Date.now() - pingAt > PING_AGAIN) ping();
   });
 
-  applyLanguage();
+  renderQuick();
+  renderDrawTools();
+  setMessageMode(messageMode);
+  renderAll();
   if (!key) {
-    document.getElementById('nokey').hidden = false;
+    $('nokey').hidden = false;
   } else {
     listen();
   }
