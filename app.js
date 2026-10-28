@@ -129,6 +129,7 @@
     if (state && s.at < state.at) return;
     state = s;
     save('state', s);
+    relayOk = true; // it came through the relay, so the relay is reachable
     statusMode = 'on';
     turningOnUntil = 0;
     renderAll();
@@ -332,6 +333,7 @@
   function takeAck(a) {
     macAt = Date.now();
     tvPower = a.tv || null;
+    relayOk = true;
     if (tvPower === 'on') turningOnUntil = 0;
     renderAll();
   }
